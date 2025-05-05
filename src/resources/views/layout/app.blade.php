@@ -107,7 +107,7 @@
     </div>
 </nav>
 <!-- Product section-->
-<section class="py-2 pt-5 print-main-block" style="min-height: calc( 100vh - 55px );">
+<section class="py-2 pt-5 print-main-block" style="min-height: calc( 100vh - 105px ); margin-top: 50px;">
     <div class="container-fluid px-5">
         <div class="row align-items-center">
             <h1 class="pt-4 pb-4">@yield('title')</h1>

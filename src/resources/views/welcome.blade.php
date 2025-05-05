@@ -1,4 +1,5 @@
 @extends('layout/app')
-@section('content')
 
-@endsection
+@section('title', 'Главная страница')
+@section('content', '')
+@section('script', '')
