@@ -9,16 +9,6 @@ Route::get('/', function () {
 });
 
 
-Route::group(['prefix' => '/admin', 'middleware' => [Authorize::using('publish articles')]], function () {
-    Route::get('/user/create', [UserController::class, 'create']);
-
-    Route::group(['prefix' => '/bi', 'middleware' => [Authorize::using('publish articles')]], function () {
-        Route::get('/user/create', [UserController::class, 'create']);
-    });
-});
-
-Route::group(['prefix' => '/driver', 'middleware' => [Authorize::using('publish articles')]], function () {
-    Route::get('/user/create', [UserController::class, 'create']);
-});
-
-
+Route::group(['prefix' => '/admin'], function () {
+    Route::get('/user', [UserController::class, 'index']);
+})->middleware('can:is_authorized');

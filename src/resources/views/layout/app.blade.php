@@ -153,10 +153,10 @@
 <div class="footer bg-light mb-0 p-2" style="height: 40px; margin-top: 15px;">
     <div class="container">
         <div class="row">
-            <div class="text-gray-800 text-center col-sm-12 col-md-6">
+            <div class="text-gray-800 text-start col-sm-12 col-md-6">
                 Copyright &copy; 3LogicGroup @if(date('Y') != '2025')2025-{{ date('Y') }}@else{{ date('Y') }}@endif
             </div>
-            <div class="text-gray-800 text-center col-sm-12 col-md-6">
+            <div class="text-gray-800 text-end col-sm-12 col-md-6">
                 <span style="font-size: 10px; padding-left: 20px;">
                     gen: {{ sprintf("%01.4f", round(microtime(true) - LARAVEL_START, 4)) }} |
                     ver: {{ date('d-m-Y H:i', (int)file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/../time_commit')) }}
