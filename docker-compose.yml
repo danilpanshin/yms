@@ -1,0 +1,86 @@
+services:
+  app:
+    build:
+      context: ./docker/app/
+      dockerfile: Dockerfile
+    container_name: app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./src:/var/www/html
+    networks:
+      - laravel-network
+
+  webserver:
+    image: nginx:alpine
+    container_name: webserver
+    restart: unless-stopped
+    ports:
+      - "3510:80"
+    volumes:
+      - ./src:/var/www/html
+      - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+    networks:
+      - laravel-network
+    depends_on:
+      - app
+
+  db:
+    image: mysql:8.0
+    container_name: db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ./docker/db/data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - laravel-network
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./docker/redis/data:/data
+    networks:
+      - laravel-network
+
+  composer:
+    build:
+      context: ./docker/app
+      dockerfile: Dockerfile
+    profiles: ["disabled"]
+    container_name: composer
+    volumes:
+      - ./src:/var/www/html
+    working_dir: /var/www/html
+    depends_on:
+      - app
+    entrypoint: ['php', '/usr/local/bin/composer']
+    networks:
+      - laravel-network
+
+  artisan:
+    build:
+      context: ./docker/app
+      dockerfile: Dockerfile
+    profiles: ["disabled"]
+    container_name: artisan
+    volumes:
+      - ./src:/var/www/html
+    working_dir: /var/www/html
+    depends_on:
+      - app
+    entrypoint: ['php', '/var/www/html/artisan']
+    networks:
+      - laravel-network
+
+networks:
+  laravel-network:
+    driver: bridge
