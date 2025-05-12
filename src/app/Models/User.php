@@ -47,15 +47,8 @@ class User extends Authenticatable
         ];
     }
 
-    public function is_admin(): bool
-    {
-        return true;
-    }
-
-    public function is_authorized(): bool
-    {
+    public function is_admin(){
         return false;
-        return $this->id ?? false;
     }
 
 }

@@ -1,9 +1,11 @@
 <?php
 
+use App\Http\Middleware\CheckAdmin;
+use App\Http\Middleware\CheckAuth;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Spatie\Permission\Exceptions\UnauthorizedException;
+use Illuminate\Session\Middleware\StartSession;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -12,7 +14,17 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+//        $middleware->group('admin', [
+//            StartSession::class,
+//            CheckAdmin::class,
+//        ]);
+//        $middleware->group('auth', [
+//            StartSession::class,
+//            CheckAdmin::class,
+//        ]);
+        $middleware->alias([
+            'auth' => \App\Http\Middleware\CheckAuth::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
 

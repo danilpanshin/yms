@@ -45,28 +45,7 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
-{{--                <li class="nav-item">--}}
-{{--                    <a class="nav-link @if(request()->routeIs('item.list')) active @endif" aria-current="page"--}}
-{{--                       href="{{ route('item.list') }}">Список</a>--}}
-{{--                </li>--}}
-{{--                <li class="nav-item">--}}
-{{--                    <a class="nav-link @if(request()->routeIs('item.new')) active @endif" aria-current="page"--}}
-{{--                       href="{{ route('item.new') }}">Добавить</a>--}}
-{{--                </li>--}}
-{{--                <li class="nav-item">--}}
-{{--                    <a class="nav-link @if(request()->routeIs('statistics')) active @endif" aria-current="page"--}}
-{{--                       href="{{ route('statistics') }}">Статистика</a>--}}
-{{--                </li>--}}
-{{--                <li class="nav-item">--}}
-{{--                    <a class="nav-link @if(request()->routeIs('log')) active @endif" aria-current="page"--}}
-{{--                       href="{{ route('log') }}">Активность</a>--}}
-{{--                </li>--}}
-{{--                @if (auth()->check() && (auth()->user()->is_manager() || auth()->user()->is_admin()))--}}
-{{--                    <li class="nav-item">--}}
-{{--                        <a class="nav-link @if(request()->routeIs('item.all_xls')) active @endif" aria-current="page"--}}
-{{--                           href="{{ route('item.all_xls') }}">Скачать</a>--}}
-{{--                    </li>--}}
-{{--                @endif--}}
+
                 @if (auth()->check() && auth()->user()->is_admin())
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle @if(request()->routeIs([
