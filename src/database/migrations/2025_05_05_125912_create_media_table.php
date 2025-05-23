@@ -26,7 +26,13 @@ return new class extends Migration
             $table->json('responsive_images');
             $table->unsignedInteger('order_column')->nullable()->index();
 
+            $table->softDeletes();
+
             $table->nullableTimestamps();
         });
+    }
+
+    public function down(): void {
+        Schema::dropIfExists('media');
     }
 };

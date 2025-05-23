@@ -16,9 +16,14 @@ return new class extends Migration
             $table->boolean('locked')->default(false);
             $table->json('payload');
 
+            $table->softDeletes();
             $table->timestamps();
 
             $table->unique(['group', 'name']);
         });
+    }
+
+    public function down(): void {
+        Schema::dropIfExists('settings');
     }
 };

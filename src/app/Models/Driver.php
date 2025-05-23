@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @param int $id
@@ -16,5 +17,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Driver extends Model
 {
-    //
+    use SoftDeletes;
+
+    protected $fillable = ['name', 'email', 'license_id', 'phone'];
 }
