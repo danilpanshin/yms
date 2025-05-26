@@ -24,7 +24,10 @@
                         <div class="mb-2 col-12">
                             <div class="row">
                                 <div class="col-12 col-sm-6">
-                                    <label for="claimAddFormControlInputDriver" class="form-label">Водитель</label>
+                                    <label for="claimAddFormControlInputDriver" class="form-label">
+                                        <i class="bi bi-asterisk text-danger fs-8"></i>
+                                        Водитель
+                                    </label>
                                 </div>
                                 <div class="col-12 col-sm-6 text-end">
                                     <button class="btn btn-warning bi bi-trash" onclick="$('#claimAddFormControlInputDriver').val(null).trigger('change');" type="button"></button>
@@ -54,27 +57,36 @@
                         </div>
 
                         <div class="mb-2 col-12 col-sm-6">
-                            <label for="claimAddFormControlSelectCarNumber" class="form-label">Номер ТС</label>
+                            <label for="claimAddFormControlSelectCarNumber" class="form-label">
+                                <i class="bi bi-asterisk text-danger fs-8"></i>
+                                Номер ТС
+                            </label>
                             <input type="text" name="car_number" class="form-control" id="claimAddFormControlSelectCarNumber"/>
                         </div>
 
-                        <div class="mb-2 col-12 col-sm-6">
-                            <label for="claimAddFormControlSelectSupplyType" class="form-label">Тип поставки</label>
-                            <select name="supply_type" class="form-select" id="claimAddFormControlSelectSupplyType">
-                                <option value="1" selected>Региональная</option>
-                                @if(Auth::user()->can_choose_external_supply_type())<option value="2" >Импортная</option>@endif
-                            </select>
-                        </div>
+{{--                        <div class="mb-2 col-12 col-sm-6">--}}
+{{--                            <label for="claimAddFormControlSelectSupplyType" class="form-label">Тип поставки</label>--}}
+{{--                            <select name="supply_type" class="form-select" id="claimAddFormControlSelectSupplyType">--}}
+{{--                                <option value="1" selected>Региональная</option>--}}
+{{--                                @if(Auth::user()->can_choose_external_supply_type())<option value="2" >Импортная</option>@endif--}}
+{{--                            </select>--}}
+{{--                        </div>--}}
 
                         <div class="mb-2 col-12 col-sm-6">
-                            <label for="claimAddFormControlSelectCarType" class="form-label">Тип ТС</label>
+                            <label for="claimAddFormControlSelectCarType" class="form-label">
+                                <i class="bi bi-asterisk text-danger fs-8"></i>
+                                Тип ТС
+                            </label>
                             <select name="car_type" class="form-select" id="claimAddFormControlSelectCarType">
                                 <option value="1" selected>Фура</option>
                             </select>
                         </div>
 
                         <div class="mb-2 col-12 col-sm-6">
-                            <label for="claimAddFormControlSelectGBort" class="form-label">Гидроборт</label>
+                            <label for="claimAddFormControlSelectGBort" class="form-label">
+                                <i class="bi bi-asterisk text-danger fs-8"></i>
+                                Гидроборт
+                            </label>
                             <select class="form-select" id="claimAddFormControlSelectGBort">
                                 <option value="0" selected>Нет</option>
                                 <option value="1">Да</option>
@@ -82,8 +94,11 @@
                         </div>
 
                         <div class="mb-2 col-12 col-sm-6">
-                            <label for="claimAddFormControlSelectPalletCount" class="form-label">Кол-во паллет</label>
-                            <input type="number" name="pallet_count" class="form-control" id="claimAddFormControlSelectPalletCount" required min="1" />
+                            <label for="claimAddFormControlSelectPalletCount" class="form-label">
+                                <i class="bi bi-asterisk text-danger fs-8"></i>
+                                Кол-во паллет
+                            </label>
+                            <input type="number" name="pallet_count" class="form-control required" id="claimAddFormControlSelectPalletCount" required min="1" />
                         </div>
 
     {{--                    <hr>--}}
@@ -93,12 +108,18 @@
     {{--                    </div>--}}
 
                         <div class="mb-2 col-12 col-sm-6">
-                            <label for="claimAddFormControlWeight" class="form-label">Масса кг</label>
+                            <label for="claimAddFormControlWeight" class="form-label">
+                                <i class="bi bi-asterisk text-danger fs-8"></i>
+                                Масса кг
+                            </label>
                             <input type="number" name="weight" class="form-control" id="claimAddFormControlWeight"/>
                         </div>
 
                         <div class="mb-2 col-12 col-sm-6">
-                            <label for="claimAddFormControlApprovalType" class="form-label">Тип приемки</label>
+                            <label for="claimAddFormControlApprovalType" class="form-label">
+                                <i class="bi bi-asterisk text-danger fs-8"></i>
+                                Тип приемки
+                            </label>
                             <select class="form-select" id="claimAddFormControlApprovalType">
                                 <option value="1" selected>По грузоместам</option>
                                 <option value="2">Потоварно</option>
@@ -106,32 +127,40 @@
                         </div>
 
                         <div class="mb-2 col-12 col-sm-6">
-                            <div class="row">
-                                <div class="col-6">
-                                    <label for="claimAddFormControlDate" class="form-label">Дата</label>
-                                    <input type="date" name="date" class="form-control" id="claimAddFormControlDate" required
-{{--                                           min="{{ now()->format('Y-m-d') }}"/>--}}/>
-                                </div>
-                                <div class="col-6">
-                                    <label for="claimAddFormControlDateTime" class="form-label">Время</label>
-                                    <input type="text" name="time" class="form-control" id="claimAddFormControlDateTime"/>
-                                </div>
-                            </div>
+                            <label for="claimAddFormControlDate" class="form-label">
+                                <i class="bi bi-asterisk text-danger fs-8"></i>
+                                Дата
+                            </label>
+                            <input type="date" name="date" class="form-control" id="claimAddFormControlDate" required
+                                   min="{{ now()->format('Y-m-d') }}"/>
                         </div>
+
+                        <div class="mb-2 col-12 col-sm-6">
+                            <label for="start_time" class="form-label">
+                                <i class="bi bi-asterisk text-danger fs-8"></i>
+                                Доступное время
+                            </label>
+                            <select name="start_time" class="form-select" id="start_time">
+                                <option value="">Сначала выберите дату и количество паллет</option>
+                            </select>
+                        </div>
+
+                        <div class="row mt-2">
+                            <div class="col-12 col-md-4"></div>
+                            <div class="col-12 col-md-4 text-center">
+                                <button type="submit" class="btn btn-primary">Забронировать</button>
+                            </div>
+                            <div class="col-12 col-md-4"></div>
+                        </div>
+
+
+
                     </div>
                 </form>
             </div>
 
-            <div class="form-group">
-                <label for="start_time">Доступное время</label>
-                <select name="start_time" id="start_time" class="form-control" required>
-                    <option value="">Сначала выберите дату и количество паллет</option>
-                </select>
-            </div>
 
-            <div class="badge bg-warning mt-4 fs-4">Функция создания временно не доступна. Но выбор тайм слотов работает</div>
 
-{{--            <button type="submit" class="btn btn-primary">Забронировать</button>--}}
 
             <div class="modal fade" id="addModalDriver" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered modal-xl">
@@ -224,11 +253,11 @@
                         gbort: gbort
                     },
                     success: function(response) {
-                        if (response.length > 0) {
+                        if (typeof response.data !== "undefined" && response.data.length > 0) {
                             let options = '<option value="">Выберите время</option>';
 
-                            response.forEach(function(slot) {
-                                options += `<option value="${slot.value}" data-gate-id="${slot.gate_id}">${slot.text}</option>`;
+                            response.data.forEach(function(slot) {
+                                options += `<option value="${slot.start}-${slot.end}">${slot.start}-${slot.end} (${response.hours}ч)</option>`;
                             });
 
                             $timeSlot.html(options).prop('disabled', false);

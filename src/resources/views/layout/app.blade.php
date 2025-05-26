@@ -31,6 +31,11 @@
 
     <!-- Own JS-->
     <script src="/assets/js/scripts.js"></script>
+    <style>
+        .select2-container {
+            width: auto !important;
+        }
+    </style>
 </head>
 <body>
 <!-- Navigation-->

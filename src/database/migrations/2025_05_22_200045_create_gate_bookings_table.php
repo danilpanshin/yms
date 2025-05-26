@@ -70,21 +70,24 @@ return new class extends Migration
 
                 for ($i = 0; $i < 2000; $i++) {
                     // Генерируем случайную дату в ближайшие 30 дней
-                    $bookingDate = Carbon::now()->addDays(rand(-300, 13))->format('Y-m-d');
+                    $bookingDate_c = Carbon::now()->addDays(rand(-300, 13));
+                    $bookingDate = $bookingDate_c->format('Y-m-d');
+
+                    $palletsCount = rand(1, 100);
 
                     // Генерируем случайное время с шагом 15 минут
                     $hour = rand(8, 19); // Рабочие часы с 8 до 20
                     $minute = rand(0, 3) * 15; // 0, 15, 30 или 45 минут
-                    $startTime = sprintf("%02d:%02d:00", $hour, $minute);
 
-                    // Рассчитываем продолжительность (от 15 минут до 4 часов)
-                    $durationMinutes = rand(1, 16) * 15;
-                    $endTime = Carbon::createFromTimeString($startTime)
-                        ->addMinutes($durationMinutes)
-                        ->format('H:i:s');
+                    $startTime_c = Carbon::now();
+                    $startTime_c->setHour($hour);
+                    $startTime_c->setMinute($minute);
+                    $startTime_c->setSecond(0);
+                    $startTime = $startTime_c->format('H:i:s');
 
-                    // Генерируем случайное количество паллет (от 1 до 100)
-                    $palletsCount = rand(1, 100);
+                    $endTimeUnix = $startTime_c->getTimestamp() + (ceil($palletsCount / 33) * 60 * 60) + (60 * 60 * 3);
+                    $endTime = Carbon::createFromTimestamp($endTimeUnix)->format('H:i:s');
+
 
                     DB::table('gate_bookings')->insert([
                         'driver_id' => $faker->randomElement($driverIds),

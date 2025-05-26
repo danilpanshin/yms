@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class GateBooking extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'gate_id', 'booking_date', 'start_time', 'end_time',
         'pallets_count', 'purpose', 'user_id', 'is_internal'

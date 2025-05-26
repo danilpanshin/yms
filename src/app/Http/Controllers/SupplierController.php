@@ -225,13 +225,15 @@ class SupplierController extends Controller
 
         ]);
 
+        $hours = $this->bookingService->calculateRequiredHoursTime($validated['pallets_count']);
         $slots = $this->bookingService->getAvailableSlots(
             $validated['date'],
             $validated['pallets_count'],
             $validated['gbort']
         );
 
-        return response()->json($slots);
+
+        return response()->json(['hours' => $hours,  'data' => $slots]);
     }
 
     public function claim_add_post(Request $request): JsonResponse
@@ -246,9 +248,8 @@ class SupplierController extends Controller
             'acceptances_id' => 'required|exists:acceptances,id',
             'car_type_id' => 'required|exists:car_types,id',
             'driver_id' => 'required|exists:drivers,id',
-            'expeditor_id' => 'required|exists:expeditors,id',
+            'expeditor_id' => 'exists:expeditors,id',
             'is_internal' => 'boolean',
-            'preferred_time' => 'nullable|date_format:H:i' // Опциональное предпочтительное время
         ]);
 
         // Рассчитываем необходимое время
