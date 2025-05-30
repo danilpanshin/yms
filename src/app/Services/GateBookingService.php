@@ -175,6 +175,54 @@ class GateBookingService
         return $mergedSlots;
     }
 
+    function findRandomSlotForInterval(string $date, int $pallets, bool $hasGbort, string $start_time)
+    {
+        $freeSlots = $this->getAvailableSlots($date, $pallets, $hasGbort);
+
+        $interval = [];
+
+        $duration_minutes = $this->calculateRequiredTime($pallets);
+
+        $start_time_arr = explode(':', $start_time);
+        $intervalStart = Carbon::make($date)->setHour((int)$start_time_arr[0])->setMinute((int)$start_time_arr[1])->setSecond(0);
+        $start_time_unix = $intervalStart->getTimestamp();
+        $intervalEnd_unix = $start_time_unix + ($duration_minutes * 60);
+        $intervalEnd = Carbon::createFromTimestamp($intervalEnd_unix);
+
+
+        // Преобразуем время в минуты для удобства сравнения
+        $timeToMinutes = function($time) {
+            [$hours, $minutes] = explode(':', $time);
+            return (int)$hours * 60 + (int)$minutes;
+        };
+
+        $intervalStart = $timeToMinutes($intervalStart->format("H:i"));
+        $intervalEnd = $timeToMinutes($intervalEnd->format("H:i"));
+
+        $suitableSlots = [];
+
+        foreach ($freeSlots as $key => $slot) {
+            $slotStart = $timeToMinutes($slot['start']);
+            $slotEnd = $timeToMinutes($slot['end'] === '24:00' ? '23:59' : $slot['end']);
+
+            // Проверяем, влезает ли интервал в этот слот
+            if ($intervalStart >= $slotStart && $intervalEnd <= $slotEnd) {
+                $suitableSlots[$key] = $slot;
+            }
+        }
+
+        // Если нет подходящих слотов
+        if (empty($suitableSlots)) {
+            return null;
+        }
+
+        // Выбираем случайный ключ из подходящих слотов
+        $randomKey = array_rand($suitableSlots);
+
+        // Выбираем случайный подходящий слот
+        return $randomKey;
+    }
+
     /**
      * Рассчитываем необходимое время в минутах
      */

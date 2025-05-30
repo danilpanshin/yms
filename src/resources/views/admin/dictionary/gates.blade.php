@@ -21,7 +21,11 @@
                         <form action="{{ route('admin.dictionary.gate.add_post') }}" method="post" class="addForm">
                             @csrf
                             <div class="mb-3">
-                                <label for="addFormControlInput1" class="form-label">Номер</label>
+                                <label for="addFormControlInput1" class="form-label">Склад</label>
+                                <input name="wh_number" type="text" class="form-control" id="addFormControlInput1">
+                            </div>
+                            <div class="mb-3">
+                                <label for="addFormControlInput1" class="form-label">Ворота</label>
                                 <input name="number" type="text" class="form-control" id="addFormControlInput1">
                             </div>
                             <div class="mb-3">
@@ -48,7 +52,8 @@
             <thead>
                 <tr>
                     <td>id</td>
-                    <td>Номер</td>
+                    <td>Склад</td>
+                    <td>Ворота</td>
                     <td>Наименование</td>
                     <td>Описание</td>
                     <td></td>
@@ -58,7 +63,9 @@
                 @foreach($gates as $row)
                     <tr>
                         <td style="width: 60px;">{{ $row['id'] }}</td>
+                        <td style="width: 120px;">{{ $row['wh_number'] }}</td>
                         <td style="width: 120px;">{{ $row['number'] }}</td>
+
                         <td style="width: 400px;">{{ $row['name'] }}</td>
                         <td>{{ $row['comment'] }}</td>
                         <td style="width: 160px;">
@@ -120,7 +127,11 @@
                         @csrf
                         <input type="hidden" name="id" value="" class="edit_field_id" />
                         <div class="mb-3">
-                            <label for="addFormControlInput1" class="form-label">Номер</label>
+                            <label for="addFormControlInput" class="form-label">Склад</label>
+                            <input name="wh_number" type="text" class="edit_field_wh_number form-control" id="addFormControlInput">
+                        </div>
+                        <div class="mb-3">
+                            <label for="addFormControlInput1" class="form-label">Ворота</label>
                             <input name="number" type="text" class="edit_field_number form-control" id="addFormControlInput1">
                         </div>
                         <div class="mb-3">
@@ -156,7 +167,8 @@
                 let ff = $('#viewModal');
                 $(ff).find('.view_data').html('<table class="table table-bordered">' +
                     '<tr><td style="width: 180px">id</td><td>' + data.id + '</td></tr>' +
-                    '<tr><td>Номер</td><td>' + data.number + '</td></tr>' +
+                    '<tr><td>Склад</td><td>' + data.wh_number + '</td></tr>' +
+                    '<tr><td>Ворота</td><td>' + data.number + '</td></tr>' +
                     '<tr><td>Наименование</td><td>' + data.name + '</td></tr>' +
                     '<tr><td>Описание</td><td>' + data.comment + '</td></tr>' +
                     '</table>');
@@ -180,6 +192,7 @@
             }).done(function(data) {
                 let ff = $('#editModal');
                 $(ff).find('.edit_field_id').val(data.id);
+                $(ff).find('.edit_field_wh_number').val(data.wh_number);
                 $(ff).find('.edit_field_number').val(data.number);
                 $(ff).find('.edit_field_name').val(data.name);
                 $(ff).find('.edit_field_comment').text(data.comment);

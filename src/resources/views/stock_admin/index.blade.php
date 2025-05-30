@@ -1,13 +1,13 @@
 @extends('layout.app')
 
-@section('title', 'Личный кабинет');
+@section('title', 'Поставщики')
 
 @section('content')
     <script src="/assets/ac/apexcharts.js"></script>
     <div class="supplier_section">
         <div class="row my-3">
             <div class="col-12 text-end">
-                <a href="{{ route('supplier.claim.add') }}" class="btn btn-primary">Создать заявку</a>
+                <a href="{{ route('stock_admin.claim.add') }}" class="btn btn-primary">Создать заявку</a>
             </div>
         </div>
         <div class="row mb-3">
@@ -17,6 +17,7 @@
                     <tr>
                         <td>Номер</td>
                         <td>Статус</td>
+                        <td>Поставщик</td>
                         <td>ФИО Водителя</td>
                         <td>ФИО Экспедитора</td>
                         <td>Дата/Время</td>
@@ -32,6 +33,7 @@
                         <tr>
                             <td>{{ $row['id'] }}</td>
                             <td><span class="badge bg-info">{{ $row['status'] }}</span></td>
+                            <td>{{ $row['supplier_name'] }}</td>
                             <td>{{ $row['driver_name'] }}</td>
                             <td>{{ $row['expeditor_name'] }}</td>
                             <td>{{ $row['booking_date']->format('Y.m.d') }} | {{ $row['start_time']->format('H:m') }} - {{ $row['end_time']->format('H:m') }}</td>
@@ -52,7 +54,14 @@
 
         <div class="row">
             <div class="col-12">
-                <h2>Будущие заявки</h2>
+                <h2>Заявки сегодня ({{ $booking->count() }})</h2>
+                <div id="supplier_date_chart2"></div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <h2>Будущие заявки ({{ $bookingLastAll->count() }})</h2>
                 <div id="supplier_date_chart"></div>
             </div>
         </div>
@@ -134,7 +143,7 @@
         series: [
             {
                 data: [
-                    @foreach($booking as $row)
+                    @foreach($bookingLastAll as $row)
 {{--                        @if($row['booking_date']->format('Y-m-d') == date('Y-m-d', time()))--}}
                             {
                                 x: '{{ $row['gate_name'] }}',
@@ -236,7 +245,117 @@
         }
     };
 
+
+    var options2 = {
+        series: [
+            {
+                data: [
+                    @foreach($booking as $row)
+                        @if($row['booking_date']->format('Y-m-d') == date('Y-m-d', time()))
+                            {
+                                x: '{{ $row['gate_name'] }}',
+                                y: [
+                                    new Date('{{ $row['booking_date']->format('Y-m-d') }} {{ $row['start_time']->format('H:m') }}').getTime(),
+                                    new Date('{{ $row['booking_date']->format('Y-m-d') }} {{ $row['end_time']->format('H:m') }}').getTime()
+                                ]
+                            },
+                        @endif
+                    @endforeach
+                ]
+            }
+        ],
+        chart: {
+            height: 350,
+            type: 'rangeBar',
+            zoom: {
+                enabled: false
+            },
+            locales: [{
+                "name": "ru",
+                "options": {
+                    "months": [
+                        "Январь",
+                        "Февраль",
+                        "Март",
+                        "Апрель",
+                        "Май",
+                        "Июнь",
+                        "Июль",
+                        "Август",
+                        "Сентябрь",
+                        "Октябрь",
+                        "Ноябрь",
+                        "Декабрь"
+                    ],
+                    "shortMonths": [
+                        "Янв",
+                        "Фев",
+                        "Мар",
+                        "Апр",
+                        "Май",
+                        "Июн",
+                        "Июл",
+                        "Авг",
+                        "Сен",
+                        "Окт",
+                        "Ноя",
+                        "Дек"
+                    ],
+                    "days": [
+                        "Воскресенье",
+                        "Понедельник",
+                        "Вторник",
+                        "Среда",
+                        "Четверг",
+                        "Пятница",
+                        "Суббота"
+                    ],
+                    "shortDays": ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"],
+                    "toolbar": {
+                        "exportToSVG": "Сохранить SVG",
+                        "exportToPNG": "Сохранить PNG",
+                        "exportToCSV": "Сохранить CSV",
+                        "menu": "Меню",
+                        "selection": "Выбор",
+                        "selectionZoom": "Выбор с увеличением",
+                        "zoomIn": "Увеличить",
+                        "zoomOut": "Уменьшить",
+                        "pan": "Перемещение",
+                        "reset": "Сбросить увеличение"
+                    }
+                }
+            }
+            ],
+            defaultLocale: 'ru'
+        },
+        plotOptions: {
+            bar: {
+                horizontal: true,
+                barHeight: '50%',
+                rangeBarGroupRows: true
+            }
+        },
+        colors: [
+            "#008FFB", "#00E396", "#FEB019", "#FF4560", "#775DD0",
+            "#3F51B5", "#546E7A", "#D4526E", "#8D5B4C", "#F86624",
+            "#D7263D", "#1B998B", "#2E294E", "#F46036", "#E2C044"
+        ],
+        fill: {
+            type: 'solid'
+        },
+        xaxis: {
+            type: 'datetime'
+        },
+        tooltip: {
+            intersect: false,
+            shared: false,
+        }
+    };
+
     var chart = new ApexCharts(document.querySelector("#supplier_date_chart"), options);
     chart.render();
+
+    var chart2 = new ApexCharts(document.querySelector("#supplier_date_chart2"), options2);
+    chart2.render();
 </script>
 @endsection

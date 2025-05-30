@@ -12,8 +12,8 @@ class IndexController extends Controller
             return redirect()->route('login');
         } else if(Auth::user()->hasRole('manager')){
             return redirect()->route('manager');
-        } else if(Auth::user()->hasRole('manager_admin')){
-            return redirect()->route('manager_admin');
+        } else if(Auth::user()->hasRole('stock_admin')){
+            return redirect()->route('stock_admin');
         } else if(Auth::user()->hasRole('supplier')){
             return redirect()->route('supplier');
         } else if(Auth::user()->hasRole('admin')){

@@ -46,7 +46,7 @@ class AdminUsersController extends Controller
         if($request->role and !empty($request->role)){
             foreach($request->role as $role){
                 $role = (int)$role;
-                if($role <= 3 and Auth::user()->hasRole(['admin', 'manager_admin'])){
+                if($role <= 3 and Auth::user()->hasRole(['admin', 'stock_admin'])){
                     $class->assignRole(Role::findOrFail($role));
                 } else if ($role > 3){
                     $class->assignRole(Role::findOrFail($role));

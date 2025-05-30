@@ -11,10 +11,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @param string $number
  * @param string $comment
  */
-class Gate extends Model
+class CarStatus extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['wh_number', 'number', 'name', 'comment'];
+    protected $fillable = ['name', 'slug'];
 
 }

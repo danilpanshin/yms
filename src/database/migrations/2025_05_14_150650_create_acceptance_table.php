@@ -15,33 +15,29 @@ return new class extends Migration
         Schema::create('acceptances', function (Blueprint $table) {
             $table->id();
             $table->string('name')->nullable(false);
-            $table->string('comment')->nullable(true);
+            $table->string('comment')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
 
-        if (app()->environment() !== 'master') {
-            // Generate and insert data only if not in master environment
-            $acceptances = [];
-            $usedNumbers = [];
+        $acceptances = [
+            ['name' => 'Региональная', 'comment' => ''],
+            ['name' => 'Импортная', 'comment' => ''],
+        ];
 
-            for ($i = 1; $i <= 13; $i++) {
-                do {
-                    $number = rand(1, 100);
-                } while (in_array($number, $usedNumbers));
+        $add_acceptances = [];
 
-                $usedNumbers[] = $number;
-
-                $acceptances[] = [
-                    'name' => 'Тип приемки ' . $number,
-                    'comment' => rand(0, 1) ? 'Sample comment for acceptance ' . $number : null,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
-            }
-
-            DB::table('acceptances')->insert($acceptances);
+        foreach($acceptances as $acceptance) {
+            $add_acceptances[] = [
+                'name' => $acceptance['name'],
+                'comment' => $acceptance['comment'],
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
         }
+
+        DB::table('acceptances')->insert($add_acceptances);
+
     }
 
     /**

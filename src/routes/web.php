@@ -8,6 +8,7 @@ use App\Http\Controllers\AdminSettingsController;
 use App\Http\Controllers\AdminUsersController;
 use App\Http\Controllers\DriverController;
 use App\Http\Controllers\IndexController;
+use App\Http\Controllers\StockAdminController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -32,17 +33,71 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
     Route::post('/logout', [UserController::class, 'logout'])->name('logout');
     Route::get('/profile', [UserController::class, 'profile'])->name('profile');
 
+    /** DRIVER */
     Route::prefix('driver')->name('driver')->group(function () {
         Route::get('/', [DriverController::class, 'index'])->name('');
     });
+    /** END DRIVER */
 
-    /**
-     * SUPPLIER
-     */
-    Route::prefix('supplier')->name('supplier')->group(function () {
-        Route::get('/', [SupplierController::class, 'index'])->name('');
+    /** STOCK ADMIN */
+    Route::prefix('stock_admin')->name('stock_admin')->middleware('is_stock_admin')->group(function () {
+        Route::get('/', [StockAdminController::class, 'index'])->name('');
+        Route::get('/supplier/ac', [StockAdminController::class, 'supplier_ac'])->name('.supplier.ac');
+
+        Route::prefix('supplier')->name('.supplier')->group(function () {
+            Route::get('/', [StockAdminController::class, 'supplier'])->name('');
+            Route::get('/with_trashed', [StockAdminController::class, 'supplier'])->name('.with_trashed');
+            Route::get('/add', [StockAdminController::class, 'supplier_add'])->name('.add');
+            Route::post('/add', [StockAdminController::class, 'supplier_add_post'])->name('.add_post');
+            Route::get('/edit/{id?}', [StockAdminController::class, 'supplier_edit'])->name('.edit');
+            Route::post('/edit/{id?}', [StockAdminController::class, 'supplier_edit_post'])->name('.edit_post');
+        });
 
         Route::prefix('claim')->name('.claim')->group(function () {
+            Route::get('/', [StockAdminController::class, 'claim'])->name('');
+            Route::get('/with_trashed', [StockAdminController::class, 'claim'])->name('.with_trashed');
+            Route::get('/add', [StockAdminController::class, 'claim_add'])->name('.add');
+            Route::post('/add', [StockAdminController::class, 'claim_add_post'])->name('.add_post');
+            Route::get('/edit/{id?}', [StockAdminController::class, 'claim_edit'])->name('.edit');
+            Route::post('/edit/{id?}', [StockAdminController::class, 'claim_edit_post'])->name('.edit_post');
+            Route::get('/slots', [StockAdminController::class, 'findAvailableSlots'])->name('.slots');
+        });
+
+        Route::prefix('driver')->name('.driver')->group(function () {
+            Route::get('/', [StockAdminController::class, 'driver'])->name('');
+            Route::get('/with_trashed', [StockAdminController::class, 'driver'])->name('.with_trashed');
+            Route::get('/one/{id?}', [StockAdminController::class, 'driver_one'])->name('.one');
+            Route::get('/add', [StockAdminController::class, 'driver_add'])->name('.add');
+            Route::post('/add', [StockAdminController::class, 'driver_add_post'])->name('.add_post');
+            Route::post('/edit/{id?}', [StockAdminController::class, 'driver_edit_post'])->name('.edit_post');
+            Route::post('/delete/{id?}', [StockAdminController::class, 'driver_delete_post'])->name('.delete_post');
+            Route::post('/restore/{id?}', [StockAdminController::class, 'driver_restore_post'])->name('.restore_post');
+            Route::get('/ac', [StockAdminController::class, 'driver_ac'])->name('.ac');
+        });
+
+        Route::prefix('expeditor')->name('.expeditor')->group(function () {
+            Route::get('/', [StockAdminController::class, 'expeditor'])->name('');
+            Route::get('/with_trashed', [StockAdminController::class, 'expeditor'])->name('.with_trashed');
+            Route::get('/one/{id?}', [StockAdminController::class, 'expeditor_one'])->name('.one');
+            Route::get('/add', [StockAdminController::class, 'expeditor_add'])->name('.add');
+            Route::post('/add', [StockAdminController::class, 'expeditor_add_post'])->name('.add_post');
+            Route::post('/edit/{id?}', [StockAdminController::class, 'expeditor_edit_post'])->name('.edit_post');
+            Route::post('/delete/{id?}', [StockAdminController::class, 'expeditor_delete_post'])->name('.delete_post');
+            Route::post('/restore/{id?}', [StockAdminController::class, 'expeditor_restore_post'])->name('.restore_post');
+            Route::get('/ac', [StockAdminController::class, 'expeditor_ac'])->name('.ac');
+        });
+    });
+    /** END STOCK ADMIN */
+
+
+    /** SUPPLIER */
+    Route::prefix('supplier')->name('supplier')->middleware('is_supplier')->group(function () {
+        Route::get('/', [SupplierController::class, 'index'])->name('');
+        Route::get('/profile', [SupplierController::class, 'profile'])->name('.profile');
+
+        Route::prefix('claim')->name('.claim')->group(function () {
+            Route::get('/', [SupplierController::class, 'claim'])->name('');
+            Route::get('/with_trashed', [SupplierController::class, 'claim'])->name('.with_trashed');
             Route::get('/add', [SupplierController::class, 'claim_add'])->name('.add');
             Route::post('/add', [SupplierController::class, 'claim_add_post'])->name('.add_post');
             Route::get('/edit/{id?}', [SupplierController::class, 'claim_edit'])->name('.edit');
@@ -81,15 +136,11 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
             Route::post('/add', [SupplierController::class, 'claim_add_post'])->name('.add_post');
         });
     });
-    /**
-     * END SUPPLIER
-     */
+    /** END SUPPLIER */
 
 
-    /**
-     * ADMIN
-     */
-    Route::prefix('admin')->name('admin')->group(function () {
+    /** ADMIN */
+    Route::prefix('admin')->name('admin')->middleware('admin')->group(function () {
         Route::get('/', [AdminController::class, 'index'])->name('');
 
         Route::prefix('user')->name('.user')->group(function () {
@@ -116,8 +167,6 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
             });
         });
     });
-    /**
-     * END ADMIN
-     */
+    /** END ADMIN */
 
 });

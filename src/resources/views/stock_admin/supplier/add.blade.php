@@ -11,15 +11,23 @@
                     @csrf
                     <div class="row">
                         <div class="mb-2 col-12">
-                            <label for="claimAddFormControlSelectSupplier" class="form-label">Поставщик</label>
-                            @if(Auth::user()->can_set_claim_supplier())
-                                <select class="form-select" id="claimAddFormControlSelectSupplier">
-
-                                </select>
-                            @else
-                                <h4>{{ Auth::user()->name }}</h4>
-                                <input type="hidden" name="supplier_id" value="{{ Auth::user()->id }}" />
-                            @endif
+                            <div class="row">
+                                <div class="col-12 col-sm-6">
+                                    <label for="claimAddFormControlInputSupplier" class="form-label">
+                                        <i class="bi bi-asterisk text-danger fs-8"></i>
+                                        Поставщик
+                                    </label>
+                                </div>
+                                <div class="col-12 col-sm-6 text-end">
+                                    <button class="btn btn-warning bi bi-trash" onclick="$('#claimAddFormControlInputSupplier').val(null).trigger('change');" type="button"></button>
+                                    <button class="btn btn-light bi bi-plus disabled" data-bs-toggle="modal" data-bs-target="#addModalSupplier" type="button"></button>
+{{--                                    --}}
+                                    <a class="btn btn-secondary bi bi-view-list" href="{{ route('stock_admin.supplier') }}" target="_blank"></a>
+                                </div>
+                            </div>
+{{--                            {{ route('stock_admin.supplier.ac') }}--}}
+                            <select class="form-control basicAutoSelect" name="driver_id" id="claimAddFormControlInputSupplier"
+                                    data-url="" autocomplete="off" required></select>
                         </div>
 
                         <div class="mb-2 col-12">
@@ -65,13 +73,13 @@
                             <input type="text" name="car_number" class="form-control" id="claimAddFormControlSelectCarNumber" required/>
                         </div>
 
-{{--                        <div class="mb-2 col-12 col-sm-6">--}}
-{{--                            <label for="claimAddFormControlSelectSupplyType" class="form-label">Тип поставки</label>--}}
-{{--                            <select name="supply_type" class="form-select" id="claimAddFormControlSelectSupplyType">--}}
-{{--                                <option value="1" selected>Региональная</option>--}}
-{{--                                @if(Auth::user()->can_choose_external_supply_type())<option value="2" >Импортная</option>@endif--}}
-{{--                            </select>--}}
-{{--                        </div>--}}
+                        <div class="mb-2 col-12 col-sm-6">
+                            <label for="claimAddFormControlSelectSupplyType" class="form-label">Тип поставки</label>
+                            <select name="supply_type" class="form-select" id="claimAddFormControlSelectSupplyType">
+                                <option value="1" selected>Региональная</option>
+                                @if(Auth::user()->can_choose_external_supply_type())<option value="2">Импортная</option>@endif
+                            </select>
+                        </div>
 
                         <div class="mb-2 col-12 col-sm-6">
                             <label for="claimAddFormControlSelectCarType" class="form-label">
@@ -81,6 +89,13 @@
                             <select name="car_type_id" class="form-select" id="claimAddFormControlSelectCarType" required>
                                 <option value="1" selected>Фура</option>
                             </select>
+                        </div>
+
+                        <div class="mb-2 col-12 col-sm-6">
+                            <div class="place_count_block" style="display: none;">
+                                <label for="claimAddFormControlSelectPlaceCount" class="form-label">Кол-во мест</label>
+                                <input type="text" name="place_count" class="form-control" id="claimAddFormControlSelectPlaceCount"/>
+                            </div>
                         </div>
 
                         <div class="mb-2 col-12 col-sm-6">
@@ -102,11 +117,7 @@
                             <input type="number" name="pallets_count" class="form-control required" id="claimAddFormControlSelectPalletCount" required min="1" />
                         </div>
 
-    {{--                    <hr>--}}
-    {{--                    <div class="mb-3 hidden">--}}
-    {{--                        <label for="claimAddFormControlSelectPlaceCount" class="form-label">Кол-во мест</label>--}}
-    {{--                        <input type="text" name="place_count" class="form-control" id="claimAddFormControlSelectPlaceCount"/>--}}
-    {{--                    </div>--}}
+
 
                         <div class="mb-2 col-12 col-sm-6">
                             <label for="claimAddFormControlWeight" class="form-label">
@@ -229,6 +240,15 @@
                 findAvailableSlots();
             });
 
+            $('#claimAddFormControlSelectSupplyType').on('change', function(){
+                console.log('claimAddFormControlSelectSupplyType change');
+                if($(this).find(":selected").val() === '2'){
+                    $('.place_count_block').show();
+                } else {
+                    $('.place_count_block').hide();
+                }
+            });
+
             $palletsCount.on('change', function(){
                 console.log('claimAddFormControlSelectPalletCount change');
                 findAvailableSlots();
@@ -341,6 +361,17 @@
                 theme: "bootstrap-5",
                 placeholder: ''
             });
+
+            $('#claimAddFormControlInputSupplier').select2({
+                ajax: {
+                    url: '{{ route('stock_admin.supplier.ac') }}',
+                    dataType: 'json'
+                    // Additional AJAX parameters go here; see the end of this chapter for the full code of this example
+                },
+                theme: "bootstrap-5",
+                placeholder: ''
+            });
+
             $('#claimAddFormControlInputExpeditor').select2({
                 ajax: {
                     url: '{{ route('supplier.expeditor.ac') }}',

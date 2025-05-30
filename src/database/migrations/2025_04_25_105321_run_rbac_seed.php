@@ -13,7 +13,7 @@ return new class extends Migration
         // Create roles
         Role::create(['name' => 'admin']);
         Role::create(['name' => 'manager']);
-        Role::create(['name' => 'manager_admin']);
+        Role::create(['name' => 'stock_admin']);
         Role::create(['name' => 'supplier']);
         Role::create(['name' => 'driver']);
     }
@@ -25,7 +25,7 @@ return new class extends Migration
     {
         Role::findByName("admin")->delete();
         Role::findByName("manager")->delete();
-        Role::findByName("manager_admin")->delete();
+        Role::findByName("stock_admin")->delete();
         Role::findByName("supplier")->delete();
         Role::findByName("driver")->delete();
     }

@@ -46,42 +46,8 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
 
-                @if (auth()->check() && auth()->user()->is_admin())
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle @if(request()->routeIs([
-                                'admin', 'admin.log', 'admin.setting', 'admin.settings', 'admin.statistics',
-                                'admin.user.list', 'admin.user.add', 'admin.user.edit'
-                            ])) active @endif" data-bs-toggle="dropdown" href="#" role="button">Админка</a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{{ route('admin.user.list') }}">Пользователи</a></li>
-                            <li><a class="dropdown-item" href="{{ route('admin.settings') }}">Настройки</a></li>
-                        </ul>
-                    </li>
-                @endif
 
             </ul>
-            @if (auth()->check())
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                        >
-                            {{ Auth::user()->name }}
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#" onclick="return false;">Профиль</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li>
-                                <form method="POST" id="logout_form" action="{{ route('logout') }}">
-                                    @csrf
-                                </form>
-                                <a class="dropdown-item" href="#" onclick="$('#logout_form').submit(); return false;">{{ __('Log Out') }}</a>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            @endif
         </div>
     </div>
 </nav>

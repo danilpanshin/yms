@@ -35,6 +35,10 @@
         .select2-container {
             width: auto !important;
         }
+
+        nav svg{ width: 20px; }
+        .sm\:hidden{ display: none; }
+
     </style>
 </head>
 <body>
@@ -55,12 +59,12 @@
                     @if (auth()->check() && auth()->user()->is_supplier())
                         <li class="nav-item">
                             <a class="nav-link @if(request()->routeIs('supplier')) active @endif" aria-current="page"
-                               href="{{ route('supplier') }}">Дашборд</a>
+                               href="{{ route('supplier') }}">Личный кабинет</a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="disabled nav-link @if(request()->routeIs('supplierв')) active @endif" aria-current="page"
-                               href="{{ route('supplier') }}">Заявки (в разработке)</a>
+                            <a class="nav-link @if(request()->routeIs('supplier.claim')) active @endif" aria-current="page"
+                               href="{{ route('supplier.claim') }}">Заявки</a>
                         </li>
 
                         <li class="nav-item">
@@ -78,7 +82,30 @@
                                href="{{ route('supplier.car') }}">Авто (в разработке)</a>
                         </li>
 
+                        <li class="nav-item">
+                            <a class="nav-link @if(request()->routeIs('supplier.profile')) active @endif" aria-current="page"
+                               href="{{ route('supplier.profile') }}">Профиль</a>
+                        </li>
+
                     @endif
+
+                        @if (auth()->check() && auth()->user()->is_stock_admin())
+                            <li class="nav-item">
+                                <a class="nav-link @if(request()->routeIs('stock_admin')) active @endif" aria-current="page"
+                                   href="{{ route('stock_admin') }}">Личный кабинет</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link @if(request()->routeIs('stock_admin.claim')) active @endif" aria-current="page"
+                                   href="{{ route('stock_admin.claim') }}">Заявки</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link @if(request()->routeIs('stock_admin.supplier')) active @endif" aria-current="page"
+                                   href="{{ route('stock_admin.supplier') }}">Поставщики</a>
+                            </li>
+
+                        @endif
 
                     @if (auth()->check() && auth()->user()->is_admin())
                         <li class="nav-item dropdown">
@@ -108,10 +135,12 @@
                             {{ Auth::user()->name }}
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{{ route('profile') }}">Профиль</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
+                            @if (auth()->check() && auth()->user()->is_supplier())
+                                <li><a class="dropdown-item" href="{{ route('supplier.profile') }}">Профиль</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                            @endif
                             <li>
                                 <form method="POST" id="logout_form" action="{{ route('logout') }}">
                                     @csrf
@@ -120,12 +149,6 @@
                                    onclick="$('#logout_form').submit(); return false;">{{ __('Log Out') }}</a>
                             </li>
                         </ul>
-                    </li>
-                </ul>
-            @else
-                <ul class="navbar-nav mb-2 mb-lg-0 ms-lg-4 justify-content-end">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link" href="{{ route('login') }}" role="button">Войти</a>
                     </li>
                 </ul>
             @endif
@@ -148,7 +171,8 @@
                             'gate' => 'Ворота',
                             'car_type' => 'Типы авто',
                             'acceptance' => 'Типы приемки',
-                            'supplier' => 'ЛК Поставщика',
+                            'supplier' => 'Личный кабинет',
+                            'stock_admin' => 'Личный кабинет старшего смены',
                         ];
                         $path = Request::path();
                         $bc = [];

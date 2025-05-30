@@ -63,8 +63,8 @@ class User extends Authenticatable
         return Auth::user()->hasRole('manager');
     }
 
-    public function is_manager_admin(){
-        return Auth::user()->hasRole('manager_admin');
+    public function is_stock_admin(){
+        return Auth::user()->hasRole('stock_admin');
     }
 
     public function is_driver(){
@@ -77,12 +77,12 @@ class User extends Authenticatable
 
     public function can_set_claim_supplier(): bool
     {
-        return $this->is_admin() || $this->is_manager() || $this->is_manager_admin();
+        return $this->is_admin() || $this->is_manager() || $this->is_stock_admin();
     }
 
     public function can_choose_external_supply_type(): bool
     {
-        return $this->is_admin() || $this->is_manager_admin();
+        return $this->is_admin() || $this->is_stock_admin();
     }
 
 }

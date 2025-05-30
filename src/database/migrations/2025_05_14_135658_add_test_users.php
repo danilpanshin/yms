@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        $users = ['admin', 'supplier', 'driver', 'manager', 'manager_admin'];
+        $users = ['admin', 'supplier', 'driver', 'manager', 'stock_admin'];
 
         $path = dirname(__FILE__) . '/../../.ht.pass';
 
