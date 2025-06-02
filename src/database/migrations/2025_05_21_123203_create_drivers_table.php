@@ -144,32 +144,6 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        if (app()->environment() !== 'master') {
-            $faker = FakerFactory::create('ru_RU'); // Russian data generator
-
-            // Ensure user with id 3 exists
-            if (User::where('id', 3)->exists()) {
-                $drivers = [];
-
-                for ($i = 0; $i < 20; $i++) {
-                    $drivers[] = [
-                        'name' => $faker->lastName . ' ' . $faker->firstName . ' ' . $faker->middleName,
-                        'user_id' => 3,
-                        'comment' => $faker->optional(0.7)->sentence,
-                        'license_id' => 'АВ' . $faker->unique()->numberBetween(100000, 999999),
-                        'phone' => '+7' . $faker->numerify('9########'),
-                        'email' => $faker->safeEmail,
-                        'invite_hash' => $faker->optional(0.6)->md5,
-                        'invite_accepted_date' => $faker->optional(0.7)->dateTimeBetween('-1 year', 'now'),
-                        'active' => $faker->boolean(80), // 80% chance of being active
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ];
-                }
-
-                DB::table('drivers')->insert($drivers);
-            }
-        }
     }
 
     /**

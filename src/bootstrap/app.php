@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Middleware\CheckIsAdmin;
 use App\Http\Middleware\CheckAuth;
+use App\Http\Middleware\CheckIsDriver;
 use App\Http\Middleware\CheckIsManager;
 use App\Http\Middleware\CheckIsStockAdmin;
 use App\Http\Middleware\CheckIsSupplier;
@@ -20,6 +22,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'is_stock_admin' => CheckIsStockAdmin::class,
             'is_supplier' => CheckIsSupplier::class,
             'is_manager' => CheckIsManager::class,
+            'is_driver' => CheckIsDriver::class,
+            'is_admin' => CheckIsAdmin::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

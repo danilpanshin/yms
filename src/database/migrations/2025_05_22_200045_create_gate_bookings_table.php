@@ -53,11 +53,14 @@ return new class extends Migration
         if (app()->environment() !== 'master') {
             $faker = FakerFactory::create('ru_RU');
 
+            $supplierIds = User::where('id', '>', '6')->pluck('id')->toArray();
+
+
+
             $gateIds = Gate::pluck('id')->toArray();
             $carTypeIds = CarType::pluck('id')->toArray();
-            $driverIds = Driver::pluck('id')->toArray();
-            $expeditorIds = Expeditor::pluck('id')->toArray();
-            $supplierIds = Supplier::pluck('id')->toArray();
+
+            $supplierIds = Supplier::pluck('user_id')->toArray();
             $acceptanceIds = Acceptance::pluck('id')->toArray();
             $statuses_past = CarStatus::where('id', '>', 40)->pluck('id')->toArray();
             $statuses_future = CarStatus::where('id', '<=', 40)->pluck('id')->toArray();
@@ -71,8 +74,13 @@ return new class extends Migration
                 'Межскладское перемещение'
             ];
 
+            for ($i = 0; $i < 200; $i++) {
 
-            for ($i = 0; $i < 20000; $i++) {
+                $user_id = $faker->randomElement($supplierIds);
+
+                $driverIds = Driver::where('user_id', '=', $user_id)->pluck('id')->toArray();
+                $expeditorIds = Expeditor::where('user_id', '=', $user_id)->pluck('id')->toArray();
+
                 // Генерируем случайную дату в ближайшие 30 дней
                 $bookingDate_c = Carbon::now()->addDays(rand(-300, 60));
                 if ($bookingDate_c->isPast()) {
@@ -115,7 +123,7 @@ return new class extends Migration
                     'gbort' => $faker->randomElement([true, false]),
                     'car_status_id' => $status,
                     'car_type_id' => $faker->randomElement($carTypeIds),
-                    'user_id' => $faker->randomElement($supplierIds),
+                    'user_id' => $user_id,
                     'is_internal' => $faker->boolean(1),
                     'created_at' => Carbon::now()->subDays(rand(0, 30)),
                     'updated_at' => Carbon::now()->subDays(rand(0, 30)),

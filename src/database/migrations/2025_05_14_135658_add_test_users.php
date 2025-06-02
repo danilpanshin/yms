@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        $users = ['admin', 'supplier', 'driver', 'manager', 'stock_admin'];
+        $users = ['admin', 'driver', 'manager', 'stock_admin', 'supplier']; // supplier must be last
 
         $path = dirname(__FILE__) . '/../../.ht.pass';
 
@@ -36,7 +36,12 @@ return new class extends Migration
                 $pass = $pass_arr[$user_row];
             }
 
+
+
             $user = new App\Models\User();
+            if($user_row == 'supplier'){
+                $user->id = 1000;
+            }
             $user->password = $pass;
             $user->email = $user_row . '_@3l.ru';
             $user->name = $user_row;

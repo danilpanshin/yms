@@ -38,6 +38,8 @@ class SupplierController extends Controller
             ->leftJoin('acceptances', 'acceptances.id', '=', 'gate_bookings.acceptances_id')
             ->leftJoin('car_types', 'car_types.id', '=', 'gate_bookings.car_type_id')
             ->leftJoin('gates', 'gates.id', '=', 'gate_bookings.gate_id')
+            ->where('drivers.user_id', '=', Auth::user()->id)
+            ->where('expeditors.user_id', '=', Auth::user()->id)
             ->orderBy('gate_bookings.booking_date')
             ->orderBy('gate_bookings.start_time')
             ->limit(1000)
@@ -51,6 +53,8 @@ class SupplierController extends Controller
             ->leftJoin('acceptances', 'acceptances.id', '=', 'gate_bookings.acceptances_id')
             ->leftJoin('car_types', 'car_types.id', '=', 'gate_bookings.car_type_id')
             ->leftJoin('gates', 'gates.id', '=', 'gate_bookings.gate_id')
+            ->where('drivers.user_id', '=', Auth::user()->id)
+            ->where('expeditors.user_id', '=', Auth::user()->id)
             ->orderBy('gate_bookings.booking_date', 'desc')
             ->orderBy('gate_bookings.start_time', 'desc')
             ->limit(10)
@@ -73,6 +77,28 @@ class SupplierController extends Controller
     {
 
         return redirect(route('supplier'));
+    }
+
+    public function claim(){
+
+        return view('supplier.claim.index', [
+            'list' => GateBooking::select(
+                'gate_bookings.*', 'drivers.name as driver_name', 'expeditors.name as expeditor_name',
+                'car_types.name as car_type_name', 'acceptances.name as acceptance_name', 'gates.name as gate_name'
+            )
+                ->where('gate_bookings.user_id', '=', Auth::user()->id)
+                ->where('gate_bookings.booking_date', '>=', Carbon::now())
+                ->leftJoin('drivers', 'drivers.id', '=', 'gate_bookings.driver_id')
+                ->leftJoin('expeditors', 'expeditors.id', '=', 'gate_bookings.expeditor_id')
+                ->leftJoin('acceptances', 'acceptances.id', '=', 'gate_bookings.acceptances_id')
+                ->leftJoin('car_types', 'car_types.id', '=', 'gate_bookings.car_type_id')
+                ->leftJoin('gates', 'gates.id', '=', 'gate_bookings.gate_id')
+                ->where('drivers.user_id', '=', Auth::user()->id)
+                ->where('expeditors.user_id', '=', Auth::user()->id)
+                ->orderBy('gate_bookings.booking_date')
+                ->orderBy('gate_bookings.start_time')
+                ->paginate(15)
+        ]);
     }
 
 

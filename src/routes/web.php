@@ -8,6 +8,7 @@ use App\Http\Controllers\AdminSettingsController;
 use App\Http\Controllers\AdminUsersController;
 use App\Http\Controllers\DriverController;
 use App\Http\Controllers\IndexController;
+use App\Http\Controllers\ManagerController;
 use App\Http\Controllers\StockAdminController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
@@ -33,8 +34,14 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
     Route::post('/logout', [UserController::class, 'logout'])->name('logout');
     Route::get('/profile', [UserController::class, 'profile'])->name('profile');
 
+    /** MANAGER */
+    Route::prefix('manager')->name('manager')->middleware('is_manager')->group(function () {
+        Route::get('/', [ManagerController::class, 'index'])->name('');
+    });
+    /** END MANAGER */
+
     /** DRIVER */
-    Route::prefix('driver')->name('driver')->group(function () {
+    Route::prefix('driver')->name('driver')->middleware('is_driver')->group(function () {
         Route::get('/', [DriverController::class, 'index'])->name('');
     });
     /** END DRIVER */

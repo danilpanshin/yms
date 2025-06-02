@@ -24,29 +24,6 @@ return new class extends Migration
             $table->softDeletes();
             $table->timestamps();
         });
-
-        if (app()->environment() !== 'master') {
-            $faker = FakerFactory::create('ru_RU'); // Russian data generator
-
-            // Ensure user with id 3 exists
-            if (User::where('id', 3)->exists()) {
-                $drivers = [];
-
-                for ($i = 0; $i < 20; $i++) {
-                    $drivers[] = [
-                        'name' => $faker->lastName . ' ' . $faker->firstName . ' ' . $faker->middleName,
-                        'user_id' => 3,
-                        'comment' => $faker->optional(0.7)->sentence,
-                        'phone' => '+7' . $faker->numerify('9########'),
-                        'email' => $faker->safeEmail,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ];
-                }
-
-                DB::table('expeditors')->insert($drivers);
-            }
-        }
     }
 
     /**
