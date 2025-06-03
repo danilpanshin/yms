@@ -7,7 +7,7 @@ services:
     restart: unless-stopped
     working_dir: /var/www/html
     volumes:
-      - ./src:/var/www/html
+      - ./:/var/www/html
     networks:
       - laravel-network
     depends_on:
@@ -21,7 +21,7 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./src:/var/www/html
+      - ./:/var/www/html
       - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
     networks:
       - laravel-network

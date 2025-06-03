@@ -2,7 +2,7 @@
 .DEFAULT_GOAL := help
 .PHONY: artisan
 
-ENV_FILE=--env-file ./src/.env
+ENV_FILE=--env-file ./.env
 
 ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
 
