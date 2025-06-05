@@ -1,3 +1,4 @@
+@php use Carbon\Carbon; @endphp
 @extends('layout.app')
 
 @section('title', 'Личный кабинет');
@@ -34,7 +35,7 @@
                             <td><span class="badge bg-info">{{ $row['status'] }}</span></td>
                             <td>{{ $row['driver_name'] }}</td>
                             <td>{{ $row['expeditor_name'] }}</td>
-                            <td>{{ $row['booking_date']->format('Y.m.d') }} | {{ $row['start_time']->format('H:m') }} - {{ $row['end_time']->format('H:m') }}</td>
+                            <td>{{ $row['booking_date']->format('Y.m.d') }} | {{ $row['start_time']->format('H:i') }} - {{ $row['end_time']->format('H:i') }}</td>
                             <td>{{ $row['car_number'] }}</td>
                             <td>{{ $row['acceptance_name'] }}</td>
                             <td>{{ $row['car_type_name'] }}</td>
@@ -50,12 +51,93 @@
             </div>
         </div>
 
+        @php
+            $gates = [];
+            $gate_names = [];
+            $gate_dates = [];
+            $gate_dates_start = [];
+            foreach($booking as $row){
+                if($row['booking_date']->format('ymd') == now()->format('ymd')){
+                    if(!in_array($row['gate_id'], $gates)){
+                        $gates[] = $row['gate_id'];
+                        $gate_names[$row['gate_id']] = $row['gate_name'];
+                        $gate_dates[$row['gate_id']] = [];
+                        $gate_dates_start[$row['gate_id']] = [];
+                    }
+
+                    $start_time = $row['booking_date']->setHour((int)$row['start_time']->format('H'))->setMinute((int)$row['start_time']->format('i'));
+                    $end_time = $row['booking_date']->setHour((int)$row['end_time']->format('H'))->setMinute((int)$row['end_time']->format('i'))->addMinutes(-1);
+
+                    $gate_dates_start[$row['gate_id']][] = $start_time->format('H_i');
+
+                    for($i=$start_time->unix();$i<=$end_time->unix();$i+=15*60){
+                        $current_carbon = Carbon::createFromTimestamp($i);
+                        $_arg = sprintf('%02d', $current_carbon->setTimezone('Europe/Moscow')->format('H')) . '_' . sprintf('%02d', ((floor($current_carbon->setTimezone('Europe/Moscow')->format('i')))));
+                        // if(!in_array($_arg, $gate_dates[$row['gate_id']])){
+                            $gate_dates[$row['gate_id']][] = $_arg;
+                        // }
+                    }
+                }
+            }
+
+            sort($gates);
+
+            foreach($gate_dates as &$gate_date_values){
+                sort($gate_date_values);
+            }
+
+            $colors = ['info', 'primary', 'success', 'danger', 'warning',];
+
+        @endphp
+
+        @if($gates)
         <div class="row">
             <div class="col-12">
-                <h2>Будущие заявки</h2>
-                <div id="supplier_date_chart"></div>
+                <h2>Заявки сегодня ({{ $booking->count() }})</h2>
+                <table class="table table-responsive table-hover table-striped table-borderless">
+                    <tr style="height: 15px;">
+                        <td style="background: none; !important; height: 15px;"></td>
+                        <td class="justify-content-center text-center" style="font-size: 14px; height: 15px;" colspan="{{ 24 * 4 }}">Час</td>
+                    </tr>
+
+                    <tr class="timeline_row" style="height: 15px;">
+                        <td style="width: 150px; font-size: 14px;">Ворота</td>
+                        @for($hour = 0; $hour <=23; $hour+=1)
+                            <td colspan="4" class="text-center time_minute_0 time_minute_45" style="font-size: 14px;">{{ sprintf('%02d', $hour) }}</td>
+                        @endfor
+                    </tr>
+                    @php $color_number = 0; $color_number_max = count($colors) - 1; @endphp
+                    @foreach($gates as $gate)
+                        <tr class="timeline_row">
+                            <td style="width: 150px; font-size: 14px;">{{ $gate_names[$gate] }}</td>
+                            @for($hour = 0; $hour <=23; $hour+=1)
+                                @for($minute = 0; $minute <= 45; $minute+=15)
+                                    @php
+                                        if(in_array(sprintf('%02d', $hour) . '_' . sprintf('%02d', $minute), $gate_dates_start[$gate])){
+                                            $color_number += 1;
+                                            if($color_number > $color_number_max){
+                                                $color_number = 0;
+                                            }
+                                        }
+                                        $current_color = $colors[$color_number];
+                                    @endphp
+                                    <td class="time_minute_{{ $minute }} time_{{ sprintf('%02d', $hour) }}_{{ sprintf('%02d', $minute) }}"
+                                        style="font-size: 2px; height: 30px;"
+                                        title="{{ $gate_names[$gate] }} - {{ $hour }}:{{ $minute }}">
+                                        @if(in_array(sprintf('%02d', $hour) . '_' . sprintf('%02d', $minute), $gate_dates[$gate]))
+                                            <div class="badge bg-{{ $current_color }} border-0 rounded-0 w-100" style="margin-top: 5px; height: 20px; opacity: 0.9">&nbsp;</div>
+                                        @else
+                                            <div class="badge bg-transparent border-0 rounded-0 w-100" style="margin-top: 5px; height: 20px; opacity: 0.9">&nbsp;</div>
+                                        @endif
+                                    </td>
+                                @endfor
+                            @endfor
+                        </tr>
+                    @endforeach
+                </table>
             </div>
         </div>
+        @endif
 
         <div class="row mb-3">
             <div class="col-12 col-sm-12 col-md-12 col-xl-6">
@@ -110,7 +192,7 @@
                             <td><span class="badge bg-info">{{ $row['status'] }}</span></td>
                             <td>{{ $row['driver_name'] }}</td>
                             <td>{{ $row['expeditor_name'] }}</td>
-                            <td>{{ $row['booking_date']->format('Y.m.d') }} {{ $row['start_time']->format('H:m') }}</td>
+                            <td>{{ $row['booking_date']->format('Y.m.d') }} | {{ $row['start_time']->format('H:i') }} - {{ $row['end_time']->format('H:i') }}</td>
                             <td>{{ $row['car_number'] }}</td>
                             <td>{{ $row['acceptances_name'] }}</td>
                             <td>{{ $row['car_type_name'] }}</td>
@@ -129,114 +211,5 @@
 @endsection
 
 @section('script')
-<script>
-    var options = {
-        series: [
-            {
-                data: [
-                    @foreach($booking as $row)
-{{--                        @if($row['booking_date']->format('Y-m-d') == date('Y-m-d', time()))--}}
-                            {
-                                x: '{{ $row['gate_name'] }}',
-                                y: [
-                                    new Date('{{ $row['booking_date']->format('Y-m-d') }} {{ $row['start_time']->format('H:m') }}').getTime(),
-                                    new Date('{{ $row['booking_date']->format('Y-m-d') }} {{ $row['end_time']->format('H:m') }}').getTime()
-                                ]
-                            },
-{{--                        @endif--}}
-                    @endforeach
-                ]
-            }
-        ],
-        chart: {
-            height: 350,
-            type: 'rangeBar',
-            zoom: {
-                enabled: false
-            },
-            locales: [{
-                "name": "ru",
-                "options": {
-                    "months": [
-                        "Январь",
-                        "Февраль",
-                        "Март",
-                        "Апрель",
-                        "Май",
-                        "Июнь",
-                        "Июль",
-                        "Август",
-                        "Сентябрь",
-                        "Октябрь",
-                        "Ноябрь",
-                        "Декабрь"
-                    ],
-                    "shortMonths": [
-                        "Янв",
-                        "Фев",
-                        "Мар",
-                        "Апр",
-                        "Май",
-                        "Июн",
-                        "Июл",
-                        "Авг",
-                        "Сен",
-                        "Окт",
-                        "Ноя",
-                        "Дек"
-                    ],
-                    "days": [
-                        "Воскресенье",
-                        "Понедельник",
-                        "Вторник",
-                        "Среда",
-                        "Четверг",
-                        "Пятница",
-                        "Суббота"
-                    ],
-                    "shortDays": ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"],
-                    "toolbar": {
-                        "exportToSVG": "Сохранить SVG",
-                        "exportToPNG": "Сохранить PNG",
-                        "exportToCSV": "Сохранить CSV",
-                        "menu": "Меню",
-                        "selection": "Выбор",
-                        "selectionZoom": "Выбор с увеличением",
-                        "zoomIn": "Увеличить",
-                        "zoomOut": "Уменьшить",
-                        "pan": "Перемещение",
-                        "reset": "Сбросить увеличение"
-                    }
-                }
-            }
-            ],
-            defaultLocale: 'ru'
-        },
-        plotOptions: {
-            bar: {
-                horizontal: true,
-                barHeight: '50%',
-                rangeBarGroupRows: true
-            }
-        },
-        colors: [
-            "#008FFB", "#00E396", "#FEB019", "#FF4560", "#775DD0",
-            "#3F51B5", "#546E7A", "#D4526E", "#8D5B4C", "#F86624",
-            "#D7263D", "#1B998B", "#2E294E", "#F46036", "#E2C044"
-        ],
-        fill: {
-            type: 'solid'
-        },
-        xaxis: {
-            type: 'datetime'
-        },
-        tooltip: {
-            intersect: false,
-            shared: false,
-        }
-    };
 
-    var chart = new ApexCharts(document.querySelector("#supplier_date_chart"), options);
-    chart.render();
-</script>
 @endsection

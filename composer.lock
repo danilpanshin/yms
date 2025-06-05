@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b79d9b15ef958baf4dd191704ca81931",
+    "content-hash": "5d5f49624cbc68d1dc9ed394ce929b79",
     "packages": [
         {
             "name": "brick/math",
@@ -215,6 +215,77 @@
                 }
             ],
             "time": "2024-09-19T14:15:21+00:00"
+        },
+        {
+            "name": "danidoble/laravel-firebird",
+            "version": "v4.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/danidoble/laravel-firebird.git",
+                "reference": "ea10b7af2ccf1f986d7a1280cf14569fed16ab1a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/danidoble/laravel-firebird/zipball/ea10b7af2ccf1f986d7a1280cf14569fed16ab1a",
+                "reference": "ea10b7af2ccf1f986d7a1280cf14569fed16ab1a",
+                "shasum": ""
+            },
+            "require": {
+                "ext-pdo": "*",
+                "illuminate/container": "^10.0|^11.0|^12.0",
+                "illuminate/database": "^10.0|^11.0|^12.0",
+                "illuminate/events": "^10.0|^11.0|^12.0",
+                "illuminate/support": "^10.0|^11.0|^12.0",
+                "php": "^8.1|^8.2|^8.3|^8.4"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.20",
+                "orchestra/testbench": "^8.31|^9.0.0|^10.0",
+                "pestphp/pest": "^2.34|^3.0",
+                "phpstan/phpstan": "^2.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Danidoble\\Firebird\\Providers\\FirebirdServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Danidoble\\Firebird\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Danidoble",
+                    "email": "ddanidoble@gmail.com",
+                    "homepage": "https://danidoble.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Firebird database driver for Laravel Framework",
+            "keywords": [
+                "danidoble",
+                "laravel firebird",
+                "package"
+            ],
+            "support": {
+                "issues": "https://github.com/danidoble/laravel-firebird/issues",
+                "source": "https://github.com/danidoble/laravel-firebird/tree/v4.0.3"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/danidoble",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-05-16T16:31:00+00:00"
         },
         {
             "name": "dflydev/dot-access-data",
@@ -9793,7 +9864,8 @@
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "php": "^8.2"
+        "php": "^8.2",
+        "ext-pdo": "*"
     },
     "platform-dev": {},
     "plugin-api-version": "2.6.0"

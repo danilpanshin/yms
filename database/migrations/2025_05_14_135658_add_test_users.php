@@ -12,9 +12,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        $users = ['admin', 'driver', 'manager', 'stock_admin', 'supplier']; // supplier must be last
+        $users = ['admin', 'driver', 'manager', 'stock_admin']; // supplier must be last
 
-        $path = dirname(__FILE__) . '/../.ht.pass';
+        $path = dirname(__FILE__) . '/../../.ht.pass';
 
         $pass_arr = [];
         if(file_exists($path)){

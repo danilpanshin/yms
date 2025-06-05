@@ -6,6 +6,7 @@ use App\Http\Requests\StoreGateBookingRequest;
 use App\Models\AjaxJsonResponse;
 use App\Models\Car;
 use App\Models\Driver;
+use App\Models\FB_SupplierTransport;
 use App\Models\Gate;
 use App\Models\Supplier;
 use App\Services\GateBookingService;
@@ -39,7 +40,7 @@ class StockAdminController extends Controller
             'drivers.name as driver_name', 'expeditors.name as expeditor_name', 'car_types.name as car_type_name',
             'acceptances.name as acceptance_name', 'gates.name as gate_name', 'suppliers.name as supplier_name'
         )
-            ->where('gate_bookings.booking_date', '>=', Carbon::now()->setHour(0)->setMinute(0)->setSecond(0))
+            ->where('gate_bookings.booking_date', '=', Carbon::now()->setHour(0)->setMinute(0)->setSecond(0))
             ->leftJoin('drivers', 'drivers.id', '=', 'gate_bookings.driver_id')
             ->leftJoin('suppliers', 'suppliers.id', '=', 'gate_bookings.user_id')
             ->leftJoin('expeditors', 'expeditors.id', '=', 'gate_bookings.expeditor_id')
@@ -49,7 +50,6 @@ class StockAdminController extends Controller
             ->leftJoin('gates', 'gates.id', '=', 'gate_bookings.gate_id')
             ->orderBy('gate_bookings.booking_date')
             ->orderBy('gate_bookings.start_time')
-            ->limit(15)
             ->get();
 
         $bookingLast = GateBooking::select('gate_bookings.*', 'car_statuses.name as status',

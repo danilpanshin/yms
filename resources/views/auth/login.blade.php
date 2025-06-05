@@ -3,14 +3,16 @@
 @section('content')
     @php
         $auth_data = [
-            'lll_admin' => 'XAp9VzvnQubG8ogczTFdiUDDffk0t0qE',
-            'admin' => '1yAeTLmTefzd0o7VYMS5TZ8riGBvMH0a',
-            'driver' => 'aOyjQgmBpjWxBjlwgRqJLQydoknhAGhB',
-            'manager' => '5PR9VtVwr3zFtTvvK4rHp1wSPnf6GxEQ',
-            'stock_admin' => 'AgvKdya2dabM3IYLAwLjw4RE4N3Dp72O',
-            'supplier' => 'PomER5dn4e51PdptCf6Xg0Nf951Sg4qj',
-            'supplier_1' => 'Ncd22juEjP3UkukJK43WO73jtZQtcVfN',
-            'supplier_12' => 'qzaX0620iFdLYY5JrHszeg7V3mB9qKgR'
+            'lll_admin' => 'zytWKbjUPEZ0yMyjyfiK2PdEuY4l0Q5n',
+            'admin' => 'P8B1Q7FBI48VGETnUQVMSFqUn9jyRLO6',
+            'driver' => 'ixPjrO1WmfU2NWdaZNJU9q2OevxY494M',
+            'manager' => 'm3EFOLf3k7qC5BaBuE3IXHL28I5HtDJx',
+            'stock_admin' => 'B5M9FYSHJQeuVjJS85LlgrgQM7ZZHOf1',
+            'supplier_1' => 'nGc8z6jOABC6aCKWWnFdd1W3WbXQpSWZ',
+            'supplier_2' => 'sp9YElgyv1Yfwwg1mUvfNcXN2SnxwORV',
+            'supplier_3' => 'YEkPchPTevg4UsAyCplYDlAmVI0I6Xnm',
+            'supplier_4' => '23v2TUeVfvifz3FBpI2zIoMoBEOPAW1s',
+            'supplier_5' => 'BdwHS4lkTkjlLpamM7aABEi4zzYUwvHY',
         ];
     @endphp
 

@@ -173,3 +173,14 @@
 }
 
 
+.timeline_row .time_minute_0{
+    border-left: #c4c4c4 1px solid !important;
+}
+.timeline_row .time_minute_45{
+    border-right: #c4c4c4 1px solid !important;
+}
+.timeline_row td{
+    padding: 0;
+    margin: 0;
+}
+

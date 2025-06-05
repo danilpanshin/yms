@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        $path = dirname(__FILE__) . '/../.ht.pass';
+        $path = dirname(__FILE__) . '/../../.ht.pass';
 
         $pass_arr = [];
         if(file_exists($path)){

@@ -24,33 +24,33 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        if (app()->environment() !== 'master') {
-            // Generate and insert data only if not in master environment
-            $gates = [];
-            $usedNumbers = [];
-            $wh = array_rand([20 => 20, 30 => 30]);
-
-            for ($i = 1; $i <= 13; $i++) {
-                do {
-                    $number = rand(1, 22);
-                } while (in_array($number, $usedNumbers));
-
-                $usedNumbers[] = $number;
-                $isActive = rand(1, 22) > 20;
-
-                $gates[] = [
-                    'number' => (string)$number,
-                    'wh_number' => (string)$wh,
-                    'name' => 'Ворота ' . $wh . ' / ' . $number,
-                    'comment' => rand(0, 1) ? 'Комментарий к воротам ' . $number : null,
-                    'is_active' => $isActive,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
-            }
-
-            DB::table('gates')->insert($gates);
-        }
+//        if (app()->environment() !== 'master') {
+//            // Generate and insert data only if not in master environment
+//            $gates = [];
+//            $usedNumbers = [];
+//            $wh = array_rand([20 => 20, 30 => 30]);
+//
+//            for ($i = 1; $i <= 13; $i++) {
+//                do {
+//                    $number = rand(1, 22);
+//                } while (in_array($number, $usedNumbers));
+//
+//                $usedNumbers[] = $number;
+//                $isActive = rand(1, 22) > 20;
+//
+//                $gates[] = [
+//                    'number' => (string)$number,
+//                    'wh_number' => (string)$wh,
+//                    'name' => 'Ворота ' . $wh . ' / ' . $number,
+//                    'comment' => rand(0, 1) ? 'Комментарий к воротам ' . $number : null,
+//                    'is_active' => $isActive,
+//                    'created_at' => now(),
+//                    'updated_at' => now(),
+//                ];
+//            }
+//
+//            DB::table('gates')->insert($gates);
+//        }
     }
 
     /**

@@ -1,25 +1,44 @@
-FROM php:8.2-fpm-alpine
+FROM php:8.2-fpm
 
 WORKDIR /var/www/html
 
-RUN apk update && apk add \
-    build-base \
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
     libzip-dev \
     zip \
     libpng-dev \
-    libjpeg-turbo-dev \
-    freetype-dev \
-    oniguruma-dev \
+    libjpeg62-turbo-dev \
+    libfreetype6-dev \
+    libonig-dev \
     libxml2-dev \
     curl \
-    bash \
-    mysql-client \
-    jpegoptim optipng pngquant gifsicle libavif
+    default-mysql-client \
+    jpegoptim \
+    optipng \
+    pngquant \
+    gifsicle \
+    libavif-dev \
+    firebird-dev \
+    libfbclient2 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN docker-php-ext-install pdo_mysql mbstring zip exif pcntl bcmath gd exif
-RUN docker-php-ext-enable exif
+# Configure and install PHP extensions
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) \
+    pdo_mysql \
+    pdo_firebird \
+    mbstring \
+    zip \
+    exif \
+    pcntl \
+    bcmath \
+    gd
 
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- \
+    --install-dir=/usr/local/bin --filename=composer
 
 EXPOSE 9000
 CMD ["php-fpm"]

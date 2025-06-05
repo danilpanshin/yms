@@ -45,7 +45,7 @@
                         <td><span class="badge bg-info">{{ $row['status'] }}</span></td>
                         <td>{{ $row['driver_name'] }}</td>
                         <td>{{ $row['expeditor_name'] }}</td>
-                        <td>{{ $row['booking_date']->format('Y.m.d') }} {{ $row['start_time']->format('H:m') }}</td>
+                        <td>{{ $row['booking_date']->format('Y.m.d') }} {{ $row['start_time']->format('H:i') }}</td>
                         <td>{{ $row['car_number'] }}</td>
                         <td>{{ $row['acceptances_name'] }}</td>
                         <td>{{ $row['car_type_name'] }}</td>

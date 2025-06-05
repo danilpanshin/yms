@@ -62,6 +62,18 @@ return [
             ]) : [],
         ],
 
+        'firebird' => [
+            'driver'   => 'firebird',
+            'host'     => env('FIREBIRD_HOST', 'localhost'),
+            'port'     => env('FIREBIRD_PORT', '3050'),
+            'database' => env('FIREBIRD_DATABASE', '/path_to/database.fdb'),
+            'username' => env('FIREBIRD_USERNAME', 'sysdba'),
+            'password' => env('FIREBIRD_PASSWORD', 'masterkey'),
+            'charset'  => env('FIREBIRD_CHARSET', 'UTF8'),
+            'role'     => null,
+            'legacy_limit_and_offset' => false, // for Firebird 3.0 and above set to false
+        ],
+
         'mariadb' => [
             'driver' => 'mariadb',
             'url' => env('DB_URL'),
