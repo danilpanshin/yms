@@ -6,11 +6,124 @@ use App\Models\BusyPeriod;
 use App\Models\Gate;
 use App\Models\GateBooking;
 use Carbon\Carbon;
+use DateInterval;
+use DateTime;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
 class GateBookingService
 {
+
+
+    /**
+     * @throws \Exception
+     */
+    function findAvailableGates($booking, $gates, $busyTimes, $startTime, $durationMinutes): array
+    {
+        // Преобразуем входные данные в удобный формат
+        $requestedStart = new DateTime($startTime);
+        $requestedEnd = clone $requestedStart;
+        $requestedEnd->add(new DateInterval('PT' . $durationMinutes . 'M'));
+
+        // Проверяем стандартные доступные слоты
+        $availableGates = $this->checkAvailableGates($booking, $gates, $busyTimes, $requestedStart, $requestedEnd);
+
+        if (!empty($availableGates)) {
+            return $availableGates;
+        }
+
+        // Если не нашли, проверяем слоты +-2 часа
+        return $this->findNearbyAvailableSlots($booking, $gates, $busyTimes, $requestedStart, $durationMinutes);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    function checkAvailableGates($booking, $gates, $busyTimes, $requestedStart, $requestedEnd): array
+    {
+        $availableGates = [];
+
+        // Группируем брони по gate_id для удобства
+        $bookingsByGate = [];
+        foreach ($booking as $book) {
+            $bookingsByGate[$book['gate_id']][] = $book;
+        }
+
+        foreach ($gates as $gate) {
+            $gateId = $gate['gate_id'];
+            $isAvailable = true;
+
+            // Проверяем общие запрещенные периоды
+            foreach ($busyTimes as $busy) {
+                $busyStart = new DateTime($busy['start_time']);
+                $busyEnd = new DateTime($busy['end_time']);
+
+                if ($this->timeOverlap($requestedStart, $requestedEnd, $busyStart, $busyEnd)) {
+                    $isAvailable = false;
+                    break;
+                }
+            }
+
+            if (!$isAvailable) {
+                continue;
+            }
+
+            // Проверяем существующие брони для этих ворот
+            if (isset($bookingsByGate[$gateId])) {
+                foreach ($bookingsByGate[$gateId] as $book) {
+                    $bookStart = new DateTime($book['start_time']);
+                    $bookEnd = new DateTime($book['end_time']);
+
+                    if ($this->timeOverlap($requestedStart, $requestedEnd, $bookStart, $bookEnd)) {
+                        $isAvailable = false;
+                        break;
+                    }
+                }
+            }
+
+            if ($isAvailable) {
+                $availableGates[] = [
+                    'gate_id' => $gateId,
+                    'start_time' => $requestedStart->format('H:i'),
+                    'end_time' => $requestedEnd->format('H:i')
+                ];
+            }
+        }
+
+        return $availableGates;
+    }
+
+    /**
+     * @throws \Exception
+     */
+    function findNearbyAvailableSlots($booking, $gates, $busyTimes, $originalStart, $durationMinutes): array
+    {
+        // Проверяем слоты в пределах +-2 часов с шагом 15 минут
+        $timeIntervals = [-120, -105, -90, -75, -60, -45, -30, -15, 15, 30, 45, 60, 75, 90, 105, 120];
+
+        foreach ($timeIntervals as $minutes) {
+            $newStart = clone $originalStart;
+            $newStart->add(new DateInterval('PT' . $minutes . 'M'));
+            $newEnd = clone $newStart;
+            $newEnd->add(new DateInterval('PT' . $durationMinutes . 'M'));
+
+            $availableGates = $this->checkAvailableGates($booking, $gates, $busyTimes, $newStart, $newEnd);
+
+            if (!empty($availableGates)) {
+                return $availableGates;
+            }
+        }
+
+        return []; // Ничего не найдено
+    }
+
+    function timeOverlap($start1, $end1, $start2, $end2): bool
+    {
+        return $start1 < $end2 && $start2 < $end1;
+    }
+
+
+
     protected int $timeStep = 15; // шаг времени в минутах
     protected int $palletsPerHour = 33; // 33 паллета в час
 

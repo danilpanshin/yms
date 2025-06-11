@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Acceptance;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -25,19 +26,16 @@ return new class extends Migration
             ['name' => 'Импортная', 'comment' => ''],
         ];
 
-        $add_acceptances = [];
-
         foreach($acceptances as $acceptance) {
-            $add_acceptances[] = [
+            $acceptance_obj = new Acceptance();
+            $acceptance_obj->fill([
                 'name' => $acceptance['name'],
                 'comment' => $acceptance['comment'],
                 'created_at' => now(),
                 'updated_at' => now(),
-            ];
+            ]);
+            $acceptance_obj->save();
         }
-
-        DB::table('acceptances')->insert($add_acceptances);
-
     }
 
     /**

@@ -89,23 +89,33 @@
 
                     @endif
 
-                        @if (auth()->check() && auth()->user()->is_stock_admin())
-                            <li class="nav-item">
-                                <a class="nav-link @if(request()->routeIs('stock_admin')) active @endif" aria-current="page"
-                                   href="{{ route('stock_admin') }}">Личный кабинет</a>
-                            </li>
+                    @if (auth()->check() && auth()->user()->is_stock_admin())
+                        <li class="nav-item">
+                            <a class="nav-link @if(request()->routeIs('stock_admin')) active @endif" aria-current="page"
+                               href="{{ route('stock_admin') }}">Личный кабинет</a>
+                        </li>
 
-                            <li class="nav-item">
-                                <a class="nav-link @if(request()->routeIs('stock_admin.claim')) active @endif" aria-current="page"
-                                   href="{{ route('stock_admin.claim') }}">Заявки</a>
-                            </li>
+                        <li class="nav-item">
+                            <a class="nav-link @if(request()->routeIs(['stock_admin.claim', 'stock_admin.claim.add'])) active @endif" aria-current="page"
+                               href="{{ route('stock_admin.claim') }}">Заявки</a>
+                        </li>
 
-                            <li class="nav-item">
-                                <a class="nav-link @if(request()->routeIs('stock_admin.supplier')) active @endif" aria-current="page"
-                                   href="{{ route('stock_admin.supplier') }}">Поставщики</a>
-                            </li>
+                        <li class="nav-item">
+                            <a class="nav-link @if(request()->routeIs('stock_admin.supplier')) active @endif" aria-current="page"
+                               href="{{ route('stock_admin.supplier') }}">Поставщики</a>
+                        </li>
 
-                        @endif
+                        <li class="nav-item">
+                            <a class="nav-link @if(request()->routeIs('stock_admin.driver')) active @endif" aria-current="page"
+                               href="{{ route('stock_admin.driver') }}">Водители</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link @if(request()->routeIs('stock_admin.expeditor')) active @endif" aria-current="page"
+                               href="{{ route('stock_admin.expeditor') }}">Экспедиторы</a>
+                        </li>
+
+                    @endif
 
                     @if (auth()->check() && auth()->user()->is_admin())
                         <li class="nav-item dropdown">
@@ -156,7 +166,7 @@
     </div>
 </nav>
 <!-- Product section-->
-<section class="py-2 pt-5 print-main-block" style="min-height: calc( 100vh - 110px ); margin-top: 50px;">
+<section class="py-2 pt-5 print-main-block" style="min-height: calc( 100vh - 85px ); margin-top: 50px;">
     <div class="container-fluid px-5">
         <div class="row align-items-center">
             <div class="row">
@@ -171,8 +181,9 @@
                             'gate' => 'Ворота',
                             'car_type' => 'Типы авто',
                             'acceptance' => 'Типы приемки',
-                            'supplier' => 'Личный кабинет',
-                            'stock_admin' => 'Личный кабинет старшего смены',
+                            'supplier' => 'Поставщик',
+                            'stock_admin' => 'Старший смены',
+                            'claim' => 'Заявки',
                         ];
                         $path = Request::path();
                         $bc = [];

@@ -3,7 +3,7 @@ services:
     build:
       context: ./docker/app/
       dockerfile: Dockerfile
-    container_name: app
+    container_name: ${APP_NAME}-app
     restart: unless-stopped
     working_dir: /var/www/html
     volumes:
@@ -16,7 +16,7 @@ services:
 
   webserver:
     image: nginx:alpine
-    container_name: webserver
+    container_name: ${APP_NAME}-webserver
     restart: unless-stopped
     ports:
       - "80:80"
@@ -30,7 +30,7 @@ services:
 
   db:
     image: mysql:8.0
-    container_name: db
+    container_name: ${APP_NAME}-db
     restart: unless-stopped
     environment:
       MYSQL_DATABASE: ${DB_DATABASE}
@@ -40,15 +40,15 @@ services:
     volumes:
       - ./docker/db/data:/var/lib/mysql
     ports:
-      - "3306:3306"
+      - "127.0.0.1:3306:3306"
     networks:
       - laravel-network
 
   redis:
     image: redis:alpine
-    container_name: redis
+    container_name: ${APP_NAME}-redis
     ports:
-      - "6379:6379"
+      - "127.0.0.1:6379:6379"
     volumes:
       - ./docker/redis/data:/data
     networks:

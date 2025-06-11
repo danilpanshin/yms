@@ -5,13 +5,22 @@
 @section('content')
     <div class="admin_users_section">
         <div class="row">
-            <div class="col-12 col-sm-6 text-start">
+            <div class="col-12 col-sm-2 text-start">
                 <div>
                     <span class="badge bg-success">Всего {{ $list->total() }}</span>
-                    Тут будут фильтры
                 </div>
             </div>
-            <div class="col-12 col-sm-6 text-end">
+            <div class="col-12 col-sm-8">
+                <form action="" method="get" id="search_form">
+                    <div class="input-group">
+                        <div class="input-group-text">Текст</div>
+                        <input name="s" type="text" class="form-control" id="autoSizingInputGroup" placeholder="Поставщик, Водитель, Экспедитор, Номер ТС" value="{{ $search_text }}">
+                        <input type="submit" class="btn btn-success" value="Поиск">
+                        <input type="reset" class="btn btn-warning" onclick="document.location.href = '{{ route('stock_admin.supplier') }}'; return false;" value="Сбросить">
+                    </div>
+                </form>
+            </div>
+            <div class="col-12 col-sm-2 text-end">
                 <a href="{{ route('stock_admin.supplier.add') }}" class="btn btn-primary">
                     Добавить
                 </a>

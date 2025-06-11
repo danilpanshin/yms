@@ -52,6 +52,7 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
     Route::prefix('stock_admin')->name('stock_admin')->middleware('is_stock_admin')->group(function () {
         Route::get('/', [StockAdminController::class, 'index'])->name('');
         Route::get('/supplier/ac', [StockAdminController::class, 'supplier_ac'])->name('.supplier.ac');
+        Route::get('/rs_supplier/ac', [StockAdminController::class, 'rs_supplier_ac'])->name('.rs_supplier.ac');
 
         Route::prefix('supplier')->name('.supplier')->group(function () {
             Route::get('/', [StockAdminController::class, 'supplier'])->name('');

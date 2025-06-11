@@ -1,9 +1,11 @@
 <?php
 
+use App\Models\CarStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use function App\Models\CarStatus;
 
 return new class extends Migration
 {
@@ -28,19 +30,17 @@ return new class extends Migration
             ['id' => 50,'name' => 'Машина уехала', 'slug' => 'left'],
             ['id' => 60,'name' => 'Отменено', 'slug' => 'canceled'],
         ];
-        $add_statuses = [];
         foreach($statuses as $status){
-            $add_statuses[] = [
+            $car_status = new CarStatus();
+            $car_status->fill([
                 'id' => $status['id'],
                 'name' => $status['name'],
                 'slug' => $status['slug'],
                 'created_at' => now(),
                 'updated_at' => now(),
-            ];
+            ]);
+            $car_status->save();
         }
-
-        DB::table('car_statuses')->insert($add_statuses);
-
     }
 
     /**

@@ -18,15 +18,16 @@
             'license_id' => ['type' => 'text', 'width' => 200, 'label' => 'Номер вод. прав'],
             'phone' => ['type' => 'text', 'width' => 250, 'label' => 'Номер тел. водителя'],
             'email' => ['type' => 'email', 'width' => 400, 'label' => 'Email водителя'],
+            'supplier_name' => ['type' => 'text', 'width' => false, 'label' => 'Поставщик']
         ];
         $add_row_cols = ['name', 'email', 'license_id', 'phone'];
-        $list_row_cols = ['id', 'name', 'email', 'license_id', 'phone'];
+        $list_row_cols = ['id', 'name', 'supplier_name', 'email', 'license_id', 'phone'];
         $edit_row_cols = ['name', 'email', 'license_id', 'phone'];
         $view_row_cols = ['id', 'name', 'email', 'license_id', 'phone'];
     @endphp
     <div class="admin_users_section">
         <div class="row">
-            <div class="col-12 col-sm-6 text-start">
+            <div class="col-12 col-sm-2 text-start">
                 @if(Route::currentRouteName() == 'supplier.driver.with_trashed')
                     <a href="{{ route('supplier.driver') }}" class="btn btn-success">Показать активных</a>
 
@@ -39,11 +40,21 @@
                     <span class="badge bg-success">Активных {{ $count['active'] }}</span>
                 </div>
             </div>
-            <div class="col-12 col-sm-6 text-end">
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
-                    Добавить
-                </button>
+            <div class="col-12 col-sm-10">
+                <form action="" method="get" id="search_form">
+                    <div class="input-group">
+                        <div class="input-group-text">Текст</div>
+                        <input name="s" type="text" class="form-control" id="autoSizingInputGroup" placeholder="ФИО, Email, Вод. права, Телефон, Поставщик" value="{{ $search_text }}">
+                        <input type="submit" class="btn btn-success" value="Поиск">
+                        <input type="reset" class="btn btn-warning" onclick="document.location.href = '{{ route('stock_admin.driver') }}'; return false;" value="Сбросить">
+                    </div>
+                </form>
             </div>
+{{--            <div class="col-12 col-sm-2 text-end">--}}
+{{--                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">--}}
+{{--                    Добавить--}}
+{{--                </button>--}}
+{{--            </div>--}}
 
             <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered modal-xl">

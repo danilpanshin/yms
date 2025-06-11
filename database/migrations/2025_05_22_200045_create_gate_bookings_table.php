@@ -29,6 +29,7 @@ return new class extends Migration
             $table->foreignId('expeditor_id')->nullable()->constrained();
             $table->boolean('is_internal')->nullable();
             $table->foreignId('car_status_id')->nullable()->constrained();
+            $table->integer('rs_id')->nullable();
             $table->timestamps();
             $table->softDeletes();
             $table->index(['gate_id', 'booking_date']);

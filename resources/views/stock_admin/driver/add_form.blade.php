@@ -3,7 +3,7 @@
 
     $driver_license_categories = DriverLicenseCategory::all();
 
-    $add_route = 'supplier.driver.add_post';
+    $add_route = 'stock_admin.driver.add_post';
     $row_cols = [
         'name' => ['type' => 'text', 'width' => 120, 'label' => 'ФИО водителя'],
         'license_id' => ['type' => 'text', 'width' => 200, 'label' => 'Номер водительских прав'],

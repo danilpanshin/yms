@@ -6,6 +6,7 @@ use App\Http\Requests\StoreGateBookingRequest;
 use App\Models\AjaxJsonResponse;
 use App\Models\Car;
 use App\Models\Driver;
+use App\Models\FB_Corr;
 use App\Models\FB_SupplierTransport;
 use App\Models\Gate;
 use App\Models\Supplier;
@@ -13,6 +14,7 @@ use App\Services\GateBookingService;
 use App\Models\Expeditor;
 use App\Models\GateBooking;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -80,9 +82,29 @@ class StockAdminController extends Controller
         return view('stock_admin.index', compact('drivers', 'booking', 'bookingLast', 'bookingLastAll'));
     }
 
-    public function supplier()
+    public function supplier(Request $request)
     {
-        return view('stock_admin.supplier.index', ['list' => Supplier::paginate(15)]);
+        $list = new Supplier();
+        if($request->get('s')){
+            $list = $list->where(function (Builder $query) use ($request) {
+                $query->where('name', 'like', '%'.$request->get('s').'%')
+                    ->orWhere('email', 'like', '%'.$request->get('s').'%')
+                    ->orWhere('phone', 'like', '%'.$request->get('s').'%')
+                    ->orWhere('address', 'like', '%'.$request->get('s').'%')
+                    ->orWhere('city', 'like', '%'.$request->get('s').'%')
+                    ->orWhere('state', 'like', '%'.$request->get('s').'%')
+                    ->orWhere('country', 'like', '%'.$request->get('s').'%')
+                    ->orWhere('zip', 'like', '%'.$request->get('s').'%')
+                    ->orWhere('inn', 'like', '%'.$request->get('s').'%')
+                    ->orWhere('rs_id', 'like', '%'.$request->get('s').'%')
+                    ->orWhere('one_ass_id', 'like', '%'.$request->get('s').'%');
+            });
+        }
+        $list = $list->paginate(15);
+        return view('stock_admin.supplier.index', [
+            'list' => $list,
+            'search_text' => $request->get('s'),
+        ]);
     }
 
     public function supplier_ac(Request $request){
@@ -105,24 +127,48 @@ class StockAdminController extends Controller
     public function history(Request $request){}
 
     public function claim(Request $request){
+        $search_date = null;
+
+        $gates = Gate::all();
+
+        $list = GateBooking::select('gate_bookings.*', 'car_statuses.name as status', 'drivers.name as driver_name',
+            'expeditors.name as expeditor_name', 'car_types.name as car_type_name', 'acceptances.name as acceptance_name',
+            'gates.name as gate_name', 'suppliers.name as supplier_name')
+            ->leftJoin('drivers', 'drivers.id', '=', 'gate_bookings.driver_id')
+            ->leftJoin('suppliers', 'suppliers.id', '=', 'gate_bookings.user_id')
+            ->leftJoin('expeditors', 'expeditors.id', '=', 'gate_bookings.expeditor_id')
+            ->leftJoin('acceptances', 'acceptances.id', '=', 'gate_bookings.acceptances_id')
+            ->leftJoin('car_types', 'car_types.id', '=', 'gate_bookings.car_type_id')
+            ->leftJoin('car_statuses', 'car_statuses.id', '=', 'gate_bookings.car_status_id')
+            ->leftJoin('gates', 'gates.id', '=', 'gate_bookings.gate_id');
+        if($request->get('s')){
+            $list = $list->where(function (Builder $query) use ($request) {
+                $query->where('drivers.name', 'like', '%'.$request->get('s').'%')
+                    ->orWhere('expeditors.name', 'like', '%'.$request->get('s').'%')
+                    ->orWhere('gates.name', 'like', '%'.$request->get('s').'%')
+                    ->orWhere('suppliers.name', 'like', '%'.$request->get('s').'%')
+                    ->orWhere('acceptances.name', 'like', '%'.$request->get('s').'%')
+                    ->orWhere('suppliers.name', 'like', '%'.$request->get('s').'%');
+            });
+        }
+        if($request->get('d')){
+            $search_date = Carbon::createFromFormat('Y-m-d', $request->get('d'))->format('Y-m-d');
+            $list = $list->where('gate_bookings.booking_date', '=', $search_date);
+        }
+
+        if($request->get('g')){
+            $list = $list->where('gate_bookings.gate_id', '=', $request->get('g'));
+        }
+
+        $list = $list->orderBy('gate_bookings.booking_date' ,'desc')
+            ->orderBy('gate_bookings.start_time', 'desc')
+            ->paginate(15)->withQueryString();
         return view('stock_admin.claim.index', [
-            'list' => GateBooking::select('gate_bookings.*', 'car_statuses.name as status', 'drivers.name as driver_name',
-                'expeditors.name as expeditor_name', 'car_types.name as car_type_name', 'acceptances.name as acceptance_name',
-                'gates.name as gate_name', 'suppliers.name as supplier_name')
-                ->leftJoin('drivers', 'drivers.id', '=', 'gate_bookings.driver_id')
-                ->leftJoin('suppliers', 'suppliers.id', '=', 'gate_bookings.user_id')
-                ->leftJoin('expeditors', 'expeditors.id', '=', 'gate_bookings.expeditor_id')
-                ->leftJoin('acceptances', 'acceptances.id', '=', 'gate_bookings.acceptances_id')
-                ->leftJoin('car_types', 'car_types.id', '=', 'gate_bookings.car_type_id')
-                ->leftJoin('car_statuses', 'car_statuses.id', '=', 'gate_bookings.car_status_id')
-                ->leftJoin('gates', 'gates.id', '=', 'gate_bookings.gate_id')
-                ->orderBy('gate_bookings.booking_date' ,'desc')
-                ->orderBy('gate_bookings.start_time')
-                ->paginate(15),
-            'count' => [
-                'active' => GateBooking::withoutTrashed()->where('user_id', '=', Auth::user()->id)->count(),
-                'inactive' => GateBooking::onlyTrashed()->where('user_id', '=', Auth::user()->id)->count(),
-            ]
+            'list' => $list,
+            'search_text' => $request->get('s'),
+            'search_date' => $search_date,
+            'gates' => $gates,
+            'search_gate' => $request->get('g'),
         ]);
     }
 
@@ -140,32 +186,51 @@ class StockAdminController extends Controller
 
 
     /** Driver */
-    public function driver(){
-        $count['inactive'] = Driver::onlyTrashed()->where('user_id', '=', Auth::user()->id)->count();
-        $count['active'] = Driver::where('user_id', '=', Auth::user()->id)->count();
-        if(Route::currentRouteName() == 'supplier.driver.with_trashed'){
+    public function driver(Request $request){
+        $count['inactive'] = Driver::onlyTrashed()->count();
+        $count['active'] = Driver::withoutTrashed()->count();
+        if(Route::currentRouteName() == 'stock_admin.driver.with_trashed'){
             $list_arr_obj = Driver::onlyTrashed();
         } else {
             $list_arr_obj = Driver::withoutTrashed();
         }
+        $list_arr_obj->select('drivers.*', 'suppliers.name as supplier_name');
+        $list_arr_obj->leftJoin('suppliers', 'suppliers.id', '=', 'drivers.user_id');
+        if($request->get('s')){
+            $list_arr_obj->where('drivers.name', 'like', '%'.$request->get('s').'%')
+                ->orWhere('drivers.email', 'like', '%'.$request->get('s').'%')
+                ->orWhere('drivers.phone', 'like', '%'.$request->get('s').'%')
+                ->orWhere('drivers.license_id', 'like', '%'.$request->get('s').'%')
+                ->orWhere('suppliers.name', 'like', '%'.$request->get('s').'%')
+            ;
+        }
         $list_arr = $list_arr_obj
-            ->where('user_id', '=', Auth::user()->id)
             ->orderBy('id', 'desc')
             ->orderBy('deleted_at', 'asc')
             ->paginate(15);
-        return view('stock_admin.driver.index', compact('list_arr', 'count'));
+        return view('stock_admin.driver.index', [
+            'list_arr' => $list_arr,
+            'count' => $count,
+            'search_text' => $request->get('s')
+        ]);
     }
 
     public function driver_one($id){
-        return response()->json(Driver::where('user_id', '=', Auth::user()->id)->find($id));
+        return response()->json(Driver::find($id));
     }
 
     public function driver_ac(Request $request){
-        $res = Driver::where('user_id', '=', Auth::user()->id)->select('id', 'name', 'license_id', 'email', 'phone');
-        $res->where('name', 'like', '%'.$request->get('term').'%');
-        $res->orWhere('license_id', 'like', '%'.$request->get('term').'%');
-        $res->orWhere('email', 'like', '%'.$request->get('term').'%');
-        $res->orWhere('phone', 'like', '%'.$request->get('term').'%');
+        $sid = $request->get('sid');
+        $res = Driver::select('id', 'name', 'license_id', 'email', 'phone');
+        if($sid) {
+            $res->where('user_id', '=', $sid);
+        }
+        if($request->get('term')) {
+            $res->where('name', 'like', '%' . $request->get('term') . '%');
+            $res->orWhere('license_id', 'like', '%' . $request->get('term') . '%');
+            $res->orWhere('email', 'like', '%' . $request->get('term') . '%');
+            $res->orWhere('phone', 'like', '%' . $request->get('term') . '%');
+        }
         $res->orderBy('id', 'desc')->limit(10);
         $res_arr = $res->get();
         $result = [];
@@ -184,10 +249,11 @@ class StockAdminController extends Controller
             'name' => 'required|max:255',
             'phone' => 'required',
             'license_id' => 'required',
-            'email' => 'required|email'
+            'email' => 'required|email',
+            'sid' => 'integer|exists:suppliers,id',
         ]);
         $new = (new Driver())->fill($validated);
-        $new->user_id = Auth::user()->id;
+        $new->user_id = $validated['sid'] ?? null;
         $new->save();
         if($request->ajax()){
             return AjaxJsonResponse::make('ok');
@@ -214,20 +280,62 @@ class StockAdminController extends Controller
     /** END Driver */
 
     /** Expeditor */
-    public function expeditor(){
+    public function expeditor(Request $request){
         $count['inactive'] = Expeditor::onlyTrashed()->count();
-        $count['active'] = Expeditor::count();
+        $count['active'] = Expeditor::withoutTrashed()->count();
         if(Route::currentRouteName() == 'supplier.expeditor.with_trashed'){
             $list_arr_obj = Expeditor::onlyTrashed();
         } else {
             $list_arr_obj = Expeditor::withoutTrashed();
         }
+
+        $list_arr_obj->select('expeditors.*', 'suppliers.name as supplier_name');
+        $list_arr_obj->leftJoin('suppliers', 'suppliers.id', '=', 'expeditors.user_id');
+
+        if($request->get('s')) {
+            $list_arr_obj->where('suppliers.name', 'like', '%' . $request->get('s') . '%');
+            $list_arr_obj->orWhere('suppliers.email', 'like', '%' . $request->get('s') . '%');
+            $list_arr_obj->orWhere('suppliers.phone', 'like', '%' . $request->get('s') . '%');
+            $list_arr_obj->orWhere('suppliers.name', 'like', '%'.$request->get('s').'%');
+        }
         $list_arr = $list_arr_obj
-            ->where('user_id', '=', Auth::user()->id)
-            ->orderBy('id', 'desc')
-            ->orderBy('deleted_at', 'asc')
+            ->orderBy('suppliers.id', 'desc')
+            ->orderBy('suppliers.deleted_at', 'asc')
             ->paginate(15);
-        return view('stock_admin.expeditor.index', compact('list_arr', 'count'));
+        return view('stock_admin.expeditor.index', [
+            'list_arr' => $list_arr,
+            'count' => $count,
+            'search_text' => $request->get('s'),
+        ]);
+    }
+
+    public function supplier_add(Request $request){
+
+        return view('stock_admin.supplier.add');
+    }
+
+    public function rs_supplier_ac(Request $request){
+        $term = $request->get('term');
+        $res_obj = FB_Corr::where('CORR_NAME', 'like', '%' . $term . '%')
+            ->orWhere('CORR_INN', 'like', '%' . $term . '%')
+            ->orWhere('CORR_ID', 'like', '%' . $term . '%');
+        $res_obj->where(function (Builder $query) use ($request) {
+            $query->where('CORR_ISACTIVE', '=', 1)
+                ->orWhere('CORR_ISTRANSCOMPANY', '=', 1);
+        });
+        $res = $res_obj->orderBy('CORR_ID', 'desc')
+            ->limit(10)
+            ->get();
+
+        $result = [];
+        foreach($res as $res_row){
+            $result[] = [
+                'id' => $res_row->CORR_ID,
+                'text' => "id: {$res_row->CORR_ID} | фио: {$res_row->CORR_NAME} | inn: {$res_row->CORR_INN} | тел.: {$res_row->Phone} | email.: {$res_row->Email}",
+            ];
+        }
+
+        return response()->json(['results' => $result]);
     }
 
     public function expeditor_one($id){
@@ -256,10 +364,11 @@ class StockAdminController extends Controller
         $validated = $request->validate([
             'name' => 'required|max:255',
             'phone' => 'required',
-            'email' => 'required|email'
+            'email' => 'required|email',
+            'sid' => 'integer|exists:suppliers,id',
         ]);
         $new = (new Expeditor())->fill($validated);
-        $new->user_id = Auth::user()->id;
+        $new->user_id = $validated['sid'] ?? null;
         $new->save();
         if($request->ajax()){
             return AjaxJsonResponse::make('ok');
@@ -318,7 +427,7 @@ class StockAdminController extends Controller
             'car_number' => 'required|string|max:20',
             # 'acceptances_id' => 'required|exists:acceptances,id',
             'car_type_id' => 'required|exists:car_types,id',
-            'driver_id' => 'required|exists:drivers,id',
+            'driver_id' => 'exists:drivers,id',
             'expeditor_id' => 'exists:expeditors,id',
             # 'is_internal' => 'boolean',
             "supplier_id" => "required|integer|exists:suppliers,id",
@@ -363,9 +472,9 @@ class StockAdminController extends Controller
         $booking->acceptances_id = $validated['acceptances_id'];
         $booking->gbort = $validated['gbort'];
         $booking->car_type_id = $validated['car_type_id'];
-        $booking->driver_id = $validated['driver_id'];
+        $booking->driver_id = $validated['driver_id'] ?? null;
         $booking->user_id = $validated['supplier_id'];
-        $booking->expeditor_id = $validated['expeditor_id'];
+        $booking->expeditor_id = $validated['expeditor_id'] ?? null;
         $booking->is_internal = $validated['is_internal'] ?? false;
         $booking->car_status_id = 10;
 

@@ -17,15 +17,16 @@
             'name' => ['type' => 'text', 'width' => false, 'label' => 'ФИО экспедитора'],
             'phone' => ['type' => 'text', 'width' => 250, 'label' => 'Номер тел. экспедитора'],
             'email' => ['type' => 'email', 'width' => 300, 'label' => 'Email экспедитора'],
+            'supplier_name' => ['type' => 'text', 'width' => false, 'label' => 'Поставщик'],
         ];
         $add_row_cols = ['name', 'email', 'phone'];
-        $list_row_cols = ['id', 'name', 'email', 'phone'];
+        $list_row_cols = ['id', 'name', 'supplier_name', 'email', 'phone'];
         $edit_row_cols = ['name', 'email', 'phone'];
         $view_row_cols = ['id', 'name', 'email', 'phone'];
     @endphp
     <div class="admin_users_section">
         <div class="row">
-            <div class="col-12 col-sm-6 text-start">
+            <div class="col-12 col-sm-2 text-start">
                 @if(Route::currentRouteName() == 'supplier.expeditor.with_trashed')
                     <a href="{{ route('supplier.expeditor') }}" class="btn btn-success">Показать активных</a>
 
@@ -38,11 +39,23 @@
                     <span class="badge bg-success">Активных {{ $count['active'] }}</span>
                 </div>
             </div>
-            <div class="col-12 col-sm-6 text-end">
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModalExpeditor">
-                    Добавить
-                </button>
+
+            <div class="col-12 col-sm-10">
+                <form action="" method="get" id="search_form">
+                    <div class="input-group">
+                        <div class="input-group-text">Текст</div>
+                        <input name="s" type="text" class="form-control" id="autoSizingInputGroup" placeholder="ФИО, Email, Телефон, Поставщик" value="{{ $search_text }}">
+                        <input type="submit" class="btn btn-success" value="Поиск">
+                        <input type="reset" class="btn btn-warning" onclick="document.location.href = '{{ route('stock_admin.expeditor') }}'; return false;" value="Сбросить">
+                    </div>
+                </form>
             </div>
+
+{{--            <div class="col-12 col-sm-2 text-end">--}}
+{{--                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModalExpeditor">--}}
+{{--                    Добавить--}}
+{{--                </button>--}}
+{{--            </div>--}}
 
             <div class="modal fade" id="addModalExpeditor" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered modal-xl">

@@ -2,12 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-
-class BusyPeriod extends Model
+class BusyPeriod extends BaseModel
 {
-    use SoftDeletes;
-
 
 }

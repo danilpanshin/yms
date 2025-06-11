@@ -1,5 +1,5 @@
 @php
-    $add_route = 'supplier.expeditor.add_post';
+    $add_route = 'stock_admin.expeditor.add_post';
     $row_cols = [
         'name' => ['type' => 'text', 'width' => 120, 'label' => 'ФИО экспедитора'],
         'phone' => ['type' => 'text', 'width' => 200, 'label' => 'Номер телефона экспедитора'],

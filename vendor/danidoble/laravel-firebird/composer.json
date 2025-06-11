@@ -1,0 +1,82 @@
+{
+  "name": "danidoble/laravel-firebird",
+  "description": "Firebird database driver for Laravel Framework",
+  "type": "library",
+  "license": "MIT",
+  "keywords": [
+    "laravel firebird",
+    "package",
+    "danidoble"
+  ],
+  "authors": [
+    {
+      "name": "Danidoble",
+      "email": "ddanidoble@gmail.com",
+      "role": "Developer",
+      "homepage": "https://danidoble.com"
+    }
+  ],
+  "require": {
+    "php": "^8.1|^8.2|^8.3|^8.4",
+    "ext-pdo": "*",
+    "illuminate/support": "^10.0|^11.0|^12.0",
+    "illuminate/container": "^10.0|^11.0|^12.0",
+    "illuminate/database": "^10.0|^11.0|^12.0",
+    "illuminate/events": "^10.0|^11.0|^12.0"
+  },
+  "require-dev": {
+    "laravel/pint": "^1.20",
+    "orchestra/testbench": "^8.31|^9.0.0|^10.0",
+    "pestphp/pest": "^2.34|^3.0",
+    "phpstan/phpstan": "^2.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "Danidoble\\Firebird\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Danidoble\\Firebird\\Tests\\": "tests/"
+    }
+  },
+  "archive": {
+    "exclude": [
+      "/tests"
+    ]
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Danidoble\\Firebird\\Providers\\FirebirdServiceProvider"
+      ]
+    }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "config": {
+    "sort-packages": true,
+    "preferred-install": "dist",
+    "optimize-autoloader": true,
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
+  },
+  "scripts": {
+    "lint": [
+      "@php vendor/bin/phpstan analyze -c phpstan.neon"
+    ],
+    "pint": [
+      "@php vendor/bin/pint"
+    ],
+    "test": [
+      "@php vendor/bin/pest"
+    ],
+    "pest": [
+      "@php vendor/bin/pest"
+    ],
+    "laravel_version": [
+      "@php vendor/bin/testbench about"
+    ]
+  }
+}

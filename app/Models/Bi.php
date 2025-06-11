@@ -2,9 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-
-class Bi extends Model
+class Bi extends BaseModel
 {
     //
 }

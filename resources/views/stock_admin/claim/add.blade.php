@@ -27,26 +27,25 @@
                             </div>
 {{--                            {{ route('stock_admin.supplier.ac') }}--}}
                             <select class="form-control basicAutoSelect" name="supplier_id" id="claimAddFormControlInputSupplier"
-                                    data-url="" autocomplete="off"></select>
+                                    data-url="" autocomplete="off" onselect="$('#claimAddFormControlInputDriver').removeAttr('disabled');"></select>
                         </div>
 
                         <div class="mb-2 col-12">
                             <div class="row">
                                 <div class="col-12 col-sm-6">
                                     <label for="claimAddFormControlInputDriver" class="form-label">
-                                        <i class="bi bi-asterisk text-danger fs-8"></i>
                                         Водитель
                                     </label>
                                 </div>
                                 <div class="col-12 col-sm-6 text-end">
                                     <button class="btn btn-warning bi bi-trash" onclick="$('#claimAddFormControlInputDriver').val(null).trigger('change');" type="button"></button>
-                                    <button class="btn btn-primary bi bi-plus" data-bs-toggle="modal" data-bs-target="#addModalDriver" type="button"></button>
+                                    <button class="btn btn-primary bi bi-plus" onclick="$('.lllAjaxFormSubmitClaimAddDriverAddModal_SID').remove(); $('.lllAjaxFormSubmitClaimAddDriverAddModal').prepend('<div class=\'lllAjaxFormSubmitClaimAddDriverAddModal_SID\'><input  type=\'hidden\' value=\'' + $('#claimAddFormControlInputSupplier').select2('data')[0].id + '\' name=\'sid\'/>Поставщик ' + $('#claimAddFormControlInputSupplier').select2('data')[0].text + '</div>')" data-bs-toggle="modal" data-bs-target="#addModalDriver" type="button"></button>
                                     <a class="btn btn-secondary bi bi-view-list" href="{{ route('stock_admin.driver') }}" target="_blank"></a>
                                 </div>
                             </div>
 
-                            <select class="form-control basicAutoSelect" name="driver_id" id="claimAddFormControlInputDriver"
-                                    data-url="{{ route('stock_admin.driver.ac') }}" autocomplete="off" required></select>
+                            <select disabled class="form-control basicAutoSelect" name="driver_id" id="claimAddFormControlInputDriver"
+                                    data-url="{{ route('stock_admin.driver.ac') }}" autocomplete="off"></select>
                         </div>
 
                         <div class="mb-2 col-12">
@@ -56,12 +55,12 @@
                                 </div>
                                 <div class="col-12 col-sm-6 text-end">
                                     <button class="btn btn-warning bi bi-trash" onclick="$('#claimAddFormControlInputExpeditor').val(null).trigger('change');" type="button"></button>
-                                    <button class="btn btn-primary bi bi-plus" data-bs-toggle="modal" data-bs-target="#addModalExpeditor" type="button"></button>
+                                    <button class="btn btn-primary bi bi-plus" onclick="$('.lllAjaxFormSubmitClaimAddExpeditorAddModal_SID').remove(); $('.lllAjaxFormSubmitClaimAddExpeditorAddModal').prepend('<div class=\'lllAjaxFormSubmitClaimAddExpeditorAddModal_SID\'><input  type=\'hidden\' value=\'' + $('#claimAddFormControlInputSupplier').select2('data')[0].id + '\' name=\'sid\'/>Поставщик ' + $('#claimAddFormControlInputSupplier').select2('data')[0].text + '</div>')" data-bs-toggle="modal" data-bs-target="#addModalExpeditor" type="button"></button>
                                     <a class="btn btn-secondary bi bi-view-list" href="{{ route('stock_admin.expeditor') }}" target="_blank"></a>
                                 </div>
                             </div>
 
-                            <select class="form-control basicAutoSelect" name="expeditor_id" id="claimAddFormControlInputExpeditor"
+                            <select disabled class="form-control basicAutoSelect" name="expeditor_id" id="claimAddFormControlInputExpeditor"
                                     data-url="{{ route('stock_admin.expeditor.ac') }}" autocomplete="off"></select>
                         </div>
 
@@ -357,7 +356,16 @@
             $('#claimAddFormControlInputDriver').select2({
                 ajax: {
                     url: '{{ route('stock_admin.driver.ac') }}',
-                    dataType: 'json'
+                    dataType: 'json',
+                    data: function (params) {
+                        let query = {
+                            term: params.term,
+                            sid: $('#claimAddFormControlInputSupplier').select2('data')[0].id
+                        }
+
+                        // Query parameters will be ?search=[term]&type=public
+                        return query;
+                    }
                     // Additional AJAX parameters go here; see the end of this chapter for the full code of this example
                 },
                 theme: "bootstrap-5",
@@ -372,12 +380,33 @@
                 },
                 theme: "bootstrap-5",
                 placeholder: ''
+            }).on('change', function (e) {
+                let val = $('#claimAddFormControlInputSupplier').select2('data')[0].id;
+                if(parseInt(val) > 0) {
+                    console.log(val);
+                    $('#claimAddFormControlInputDriver').data('sid', val);
+                    $('#claimAddFormControlInputDriver').prop('disabled', false);
+                    $('#claimAddFormControlInputExpeditor').data('sid', val);
+                    $('#claimAddFormControlInputExpeditor').prop('disabled', false);
+                } else {
+                    $('#claimAddFormControlInputDriver').prop('disabled', true);
+                    $('#claimAddFormControlInputExpeditor').prop('disabled', true);
+                }
             });
 
             $('#claimAddFormControlInputExpeditor').select2({
                 ajax: {
                     url: '{{ route('stock_admin.expeditor.ac') }}',
-                    dataType: 'json'
+                    dataType: 'json',
+                    data: function (params) {
+                        let query = {
+                            term: params.term,
+                            sid: $('#claimAddFormControlInputSupplier').select2('data')[0].id
+                        }
+
+                        // Query parameters will be ?search=[term]&type=public
+                        return query;
+                    }
                     // Additional AJAX parameters go here; see the end of this chapter for the full code of this example
                 },
                 theme: "bootstrap-5",
