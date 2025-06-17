@@ -37,6 +37,7 @@ class SyncBooking extends Command
         $last_rs_id = GateBooking::max('rs_id');
         $last_id = GateBooking::select('id')->where('rs_id', $last_rs_id)->first()->id;
         $this->info('max rs id = '. $last_rs_id . ' / max local id = ' . $last_id);
+        dump($last_rs_id);
         $rs_new = FB_SupplierTransport::where('ST_ID', '>', $last_rs_id)->get();
         $local_new = GateBooking::whereNull('rs_id')->get();
 

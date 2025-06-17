@@ -13,6 +13,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class SupplierController extends Controller
 {
@@ -47,11 +48,75 @@ class SupplierController extends Controller
     public function claim(): View|Application|Factory
     {
         return view('supplier.claim.index', [
-            'list' => $this->bookingService->get_list(true, false, true, 15, false, true),
+            'list' => $this->bookingService->get_list(false, false, true, 15, false, true),
         ]);
     }
 
 
+    public function getAllAvailableIntervals(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'date' => 'required|date',
+            'pallets_count' => 'required|integer|min:1',
+            'gbort' => 'required|integer',
+        ]);
+        $slotStep = 15;
+        $minutes_required = $this->bookingService->calculateRequiredMinutesTime($validated['pallets_count']);
+
+        $dayStart = Carbon::createFromTime(8, 0);
+        $dayEnd = Carbon::createFromTime(20, 0);
+        $available = [];
+
+        // Получаем ID ворот с нужным gbort
+        $gateIds = DB::table('gates')
+            ->where('gbort', $validated['gbort'])
+            ->where('is_active', true)
+            ->whereNull('deleted_at')
+            ->pluck('id');
+
+        // Занятые интервалы из бронирований (только нужные ворота)
+        $busyBookings = DB::table('gate_bookings')
+            ->whereIn('gate_id', $gateIds)
+            ->whereDate('booking_date', $validated['date']->toDateString())
+            ->whereNull('deleted_at')
+            ->select('start_time', 'end_time')
+            ->get();
+
+        // Занятые глобальные периоды
+        $busyPeriods = DB::table('busy_periods')
+            ->whereNull('deleted_at')
+            ->select('start_time', 'end_time')
+            ->get();
+
+        $busyIntervals = collect()->merge($busyBookings)->merge($busyPeriods);
+
+        // Перебор временных окон
+        $cursor = $dayStart->copy();
+        while ($cursor->lt($dayEnd)) {
+            $slotStart = $cursor->copy();
+            $slotEnd = $slotStart->copy()->addMinutes($minutes_required);
+
+            if ($slotEnd->gt($dayEnd)) {
+                break;
+            }
+
+            $slotStartStr = $slotStart->format('H:i');
+            $slotEndStr = $slotEnd->format('H:i');
+
+            $conflict = $busyIntervals->contains(function ($interval) use ($slotStartStr, $slotEndStr) {
+                return $slotStartStr < $interval->end_time && $slotEndStr > $interval->start_time;
+            });
+
+            if (!$conflict) {
+                $available[] = ['start' => $slotStartStr, 'end' => $slotEndStr];
+            }
+
+            $cursor->addMinutes($slotStep);
+        }
+
+        return response()->json(['data' => $available]);
+        # return $available;
+    }
 
 
 
@@ -63,6 +128,8 @@ class SupplierController extends Controller
             'pallets_count' => 'required|integer|min:1',
             'gbort' => 'required|integer',
         ]);
+
+
 
         $hours = $this->bookingService->calculateRequiredHoursTime($validated['pallets_count']);
         $slots = $this->bookingService->getAvailableSlots(

@@ -112,7 +112,8 @@ return new class extends Migration
                 $b_date_start = Carbon::parse($row->ST_UN_START);
                 $b_date_end = Carbon::parse($row->ST_UN_END);
                 $gate_booking = new GateBooking();
-                $gate_booking->fill([
+                dump($row);
+                $gate_booking->insert([
                     'driver_id' => null,
                     'gate_id' => $gate_id,
                     'expeditor_id' => null,

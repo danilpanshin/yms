@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('gate_bookings', function (Blueprint $table) {
             $table->id();
             $table->foreignId('gate_id')->nullable()->constrained();
-            $table->date('booking_date');
+            $table->date('booking_date')->nullable();
             $table->time('start_time')->nullable();
             $table->time('end_time')->nullable();
             $table->integer('pallets_count')->nullable();
@@ -25,7 +25,7 @@ return new class extends Migration
             $table->boolean('gbort')->default(false);
             $table->foreignId('car_type_id')->nullable()->constrained();
             $table->foreignId('driver_id')->nullable()->constrained();
-            $table->foreignId('user_id')->constrained();
+            $table->foreignId('user_id')->nullable()->constrained();
             $table->foreignId('expeditor_id')->nullable()->constrained();
             $table->boolean('is_internal')->nullable();
             $table->foreignId('car_status_id')->nullable()->constrained();

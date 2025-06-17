@@ -160,8 +160,16 @@ class GateBookingService
         $res->leftJoin('car_types', 'car_types.id', '=', 'gate_bookings.car_type_id');
         $res->leftJoin('gates', 'gates.id', '=', 'gate_bookings.gate_id');
         if($filter_joins) {
-            $res->where('drivers.user_id', '=', $this->user_id);
-            $res->where('expeditors.user_id', '=', $this->user_id);
+            $res->where(function($query) {
+                return $query
+                    ->where('drivers.user_id', '=', $this->user_id)
+                    ->orWhereNull('gate_bookings.driver_id');
+            });
+            $res->where(function($query) {
+                return $query
+                    ->where('expeditors.user_id', '=', $this->user_id)
+                    ->orWhereNull('gate_bookings.expeditor_id');
+            });
         }
         $res->orderBy('gate_bookings.booking_date');
         $res->orderBy('gate_bookings.start_time');
@@ -412,7 +420,7 @@ class GateBookingService
     /**
      * Рассчитываем необходимое время в минутах
      */
-    public function calculateRequiredTime(int $palletsCount): int
+    public function calculateRequiredMinutesTime(int $palletsCount): int
     {
         // Округляем до ближайшего шага времени в большую сторону
         return $this->calculateRequiredHoursTime($palletsCount) * 60;
