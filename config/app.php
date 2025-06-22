@@ -123,4 +123,11 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'sms' => [
+        'token' => env('SMS_TOKEN', ''),
+        'url' => env('SMS_URL', 'https://api.unisender.com/ru/api/sendSms'),
+        'format' => env('SMS_FORMAT', 'json'),
+        'sender' => env('SMS_SENDER', '3Logic'),
+    ]
+
 ];

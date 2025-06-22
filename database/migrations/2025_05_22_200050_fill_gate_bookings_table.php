@@ -111,9 +111,23 @@ return new class extends Migration
                 $b_date = Carbon::parse($row->ST_ARRIVAL);
                 $b_date_start = Carbon::parse($row->ST_UN_START);
                 $b_date_end = Carbon::parse($row->ST_UN_END);
-                $gate_booking = new GateBooking();
-                dump($row);
-                $gate_booking->insert([
+
+                $arrival_status = 10;
+                if($row->ST_STATUS == 2) {
+                    if ($row->ST_UN_START) {
+                        $arrival_status = 30;
+                    }
+                    if ($row->ST_UN_END) {
+                        $arrival_status = 40;
+                    }
+                } else if ($row->ST_STATUS == 0) {
+                    $arrival_status = 30;
+                } else {
+                    $arrival_status = 50;
+                }
+
+                $new_gb = new GateBooking;
+                $new_gb->forceFill([
                     'driver_id' => null,
                     'gate_id' => $gate_id,
                     'expeditor_id' => null,
@@ -126,7 +140,7 @@ return new class extends Migration
                     'car_number' => $row->ST_TRANS_NO,
                     'acceptances_id' => 1,
                     'gbort' => false,
-                    'car_status_id' => null,
+                    'car_status_id' => $arrival_status,
                     'car_type_id' => 1,
                     'user_id' => $corr_user_ids[$row->ST_CORR],
                     'is_internal' => false,
@@ -134,7 +148,8 @@ return new class extends Migration
                     'updated_at' => $b_date,
                     'rs_id' => $row->ST_ID,
                 ]);
-                $gate_booking->save();
+                $new_gb->save();
+
             }
         }
     }

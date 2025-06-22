@@ -15,12 +15,6 @@ class GateBooking extends BaseModel
         'end_time' => 'datetime:H:i',
     ];
 
-    public static function calculateDuration(int $palletsCount): int
-    {
-        // Каждые 33 паллеты добавляют 1 час
-        return max(1, ceil($palletsCount / 33));
-    }
-
     public function gate()
     {
         return $this->belongsTo(Gate::class);

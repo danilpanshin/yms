@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreGateBookingRequest;
 use App\Models\AjaxJsonResponse;
 use App\Models\Car;
+use App\Models\CarStatus;
 use App\Models\Driver;
 use App\Models\FB_Corr;
 use App\Models\FB_SupplierTransport;
@@ -13,6 +14,7 @@ use App\Models\Supplier;
 use App\Services\GateBookingService;
 use App\Models\Expeditor;
 use App\Models\GateBooking;
+use App\Services\SmsService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
@@ -24,12 +26,12 @@ use Illuminate\Support\Facades\Route;
 
 class StockAdminController extends Controller
 {
-    protected GateBookingService $bookingService;
-    protected $paginationTheme = 'bootstrap';
 
-    public function __construct(GateBookingService $bookingService)
+    protected GateBookingService $bookingService;
+
+    public function __construct()
     {
-        $this->bookingService = $bookingService;
+        $this->bookingService = new GateBookingService();
     }
 
     public function index(){
@@ -37,6 +39,9 @@ class StockAdminController extends Controller
             ->orderBy('drivers.id', 'desc')
             ->limit(10)
             ->get();
+
+        $car_statuses = CarStatus::all();
+
         # $cars = Car::where('user_id', '=', Auth::user()->id)->get();
         $booking = GateBooking::select('gate_bookings.*', 'car_statuses.name as status',
             'drivers.name as driver_name', 'expeditors.name as expeditor_name', 'car_types.name as car_type_name',
@@ -79,11 +84,13 @@ class StockAdminController extends Controller
             ->orderBy('gate_bookings.start_time', 'desc')
             ->get();
 
-        return view('stock_admin.index', compact('drivers', 'booking', 'bookingLast', 'bookingLastAll'));
+        return view('stock_admin.index', compact('drivers', 'booking', 'bookingLast', 'bookingLastAll', 'car_statuses'));
     }
 
     public function supplier(Request $request)
     {
+        # $res = SmsService::send('+7(926)-334-27-39', 'Тест 3');
+
         $list = new Supplier();
         if($request->get('s')){
             $list = $list->where(function (Builder $query) use ($request) {
@@ -131,6 +138,8 @@ class StockAdminController extends Controller
 
         $gates = Gate::all();
 
+        $car_statuses = CarStatus::all();
+
         $list = GateBooking::select('gate_bookings.*', 'car_statuses.name as status', 'drivers.name as driver_name',
             'expeditors.name as expeditor_name', 'car_types.name as car_type_name', 'acceptances.name as acceptance_name',
             'gates.name as gate_name', 'suppliers.name as supplier_name')
@@ -156,6 +165,10 @@ class StockAdminController extends Controller
             $list = $list->where('gate_bookings.booking_date', '=', $search_date);
         }
 
+        if($request->get('cs')){
+            $list = $list->where('gate_bookings.car_status_id', '=', $request->get('cs'));
+        }
+
         if($request->get('g')){
             $list = $list->where('gate_bookings.gate_id', '=', $request->get('g'));
         }
@@ -168,7 +181,9 @@ class StockAdminController extends Controller
             'search_text' => $request->get('s'),
             'search_date' => $search_date,
             'gates' => $gates,
+            'car_statuses' => $car_statuses,
             'search_gate' => $request->get('g'),
+            'search_car_status' => $request->get('cs'),
         ]);
     }
 
@@ -321,7 +336,7 @@ class StockAdminController extends Controller
             ->orWhere('CORR_ID', 'like', '%' . $term . '%');
         $res_obj->where(function (Builder $query) use ($request) {
             $query->where('CORR_ISACTIVE', '=', 1)
-                ->orWhere('CORR_ISTRANSCOMPANY', '=', 1);
+                ->where('CORR_ISTRANSCOMPANY', '=', 1);
         });
         $res = $res_obj->orderBy('CORR_ID', 'desc')
             ->limit(10)
@@ -404,16 +419,151 @@ class StockAdminController extends Controller
             'gbort' => 'required|integer',
 
         ]);
+        $validated['date'] = Carbon::createFromFormat('Y-m-d', $validated['date']);
+        $arr = $this->getAllAvailableIntervals($validated['date'], ceil($validated['pallets_count'] / 60) * 60, $validated['gbort']);
+        # dump($arr);
+        # $hours = $this->bookingService->calculateRequiredHoursTime($validated['pallets_count']);
+//        $slots = $this->bookingService->getAvailableSlots(
+//            $validated['date'],
+//            $validated['pallets_count'],
+//            $validated['gbort']
+//        );
 
-        $hours = $this->bookingService->calculateRequiredHoursTime($validated['pallets_count']);
-        $slots = $this->bookingService->getAvailableSlots(
-            $validated['date'],
-            $validated['pallets_count'],
-            $validated['gbort']
-        );
+
+        return response()->json(['hours' => [],  'data' => $arr]);
+    }
 
 
-        return response()->json(['hours' => $hours,  'data' => $slots]);
+    public function getAllAvailableIntervals(Carbon $bookingDate, int $durationMinutes, bool $gbort, int $slotStep = 15): array
+    {
+        $dayStart = Carbon::createFromTime(0, 0);
+        $dayEnd = Carbon::createFromTime(24, 0);
+        $available = [];
+
+        // Получаем ID ворот с нужным gbort
+        $gateIds = DB::table('gates')
+            ->where('gbort', $gbort)
+            ->where('is_active', true)
+            ->whereNull('deleted_at')
+            ->pluck('id');
+
+        // Занятые интервалы из бронирований (только нужные ворота)
+        $busyBookings = DB::table('gate_bookings')
+            ->whereIn('gate_id', $gateIds)
+            ->whereDate('booking_date', $bookingDate->toDateString())
+            ->whereNull('deleted_at')
+            ->select('start_time', 'end_time')
+            ->get();
+
+        // Занятые глобальные периоды
+        $busyPeriods = DB::table('busy_periods')
+            ->whereNull('deleted_at')
+            ->select('start_time', 'end_time')
+            ->get();
+
+        $busyIntervals = collect()->merge($busyBookings)->merge($busyPeriods);
+
+        // Перебор временных окон
+        $cursor = $dayStart->copy();
+        while ($cursor->lt($dayEnd)) {
+            $slotStart = $cursor->copy();
+            $slotEnd = $slotStart->copy()->addMinutes($durationMinutes);
+
+            if ($slotEnd->gt($dayEnd)) {
+                break;
+            }
+
+            $slotStartStr = $slotStart->format('H:i');
+            $slotEndStr = $slotEnd->format('H:i');
+
+            $conflict = $busyIntervals->contains(function ($interval) use ($slotStartStr, $slotEndStr) {
+                return $slotStartStr < $interval->end_time && $slotEndStr > $interval->start_time;
+            });
+
+            if (!$conflict) {
+                $available[] = ['start' => $slotStartStr, 'end' => $slotEndStr];
+            }
+
+            $cursor->addMinutes($slotStep);
+        }
+
+        return $available;
+    }
+
+    public function findGateAndTimeSlot(
+        Carbon $bookingDate,
+        string $minStartTime,
+        int $durationMinutes,
+        bool $gbort,
+        int $slotStep = 15
+    ): ?array {
+        $dayEnd = Carbon::createFromTime(24, 0);
+        $slotCount = (int) ceil($durationMinutes / $slotStep);
+
+        // Все подходящие ворота
+        $gates = DB::table('gates')
+            ->where('gbort', $gbort)
+            ->whereNull('deleted_at')
+            ->get();
+
+        // Глобальные busy периоды
+        $busyPeriods = DB::table('busy_periods')
+            ->whereNull('deleted_at')
+            ->select('start_time', 'end_time')
+            ->get();
+
+        foreach ($gates as $gate) {
+            $bookings = DB::table('gate_bookings')
+                ->where('gate_id', $gate->id)
+                ->whereDate('booking_date', $bookingDate->toDateString())
+                ->whereNull('deleted_at')
+                ->select('start_time', 'end_time')
+                ->get();
+
+            $cursor = Carbon::createFromTimeString($minStartTime);
+
+            while ($cursor->lt($dayEnd)) {
+                $slotStart = $cursor->copy();
+                $slotEnd = $slotStart->copy()->addMinutes($durationMinutes);
+
+                if ($slotEnd->gt($dayEnd)) {
+                    break;
+                }
+
+                $slotStartStr = $slotStart->format('H:i');
+                $slotEndStr = $slotEnd->format('H:i');
+
+                $hasConflict = false;
+
+                foreach ($busyPeriods as $interval) {
+                    if ($slotStartStr < $interval->end_time && $slotEndStr > $interval->start_time) {
+                        $hasConflict = true;
+                        break;
+                    }
+                }
+
+                if (!$hasConflict) {
+                    foreach ($bookings as $interval) {
+                        if ($slotStartStr < $interval->end_time && $slotEndStr > $interval->start_time) {
+                            $hasConflict = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!$hasConflict) {
+                    return [
+                        'gate_id' => $gate->id,
+                        'start' => $slotStartStr,
+                        'end' => $slotEndStr,
+                    ];
+                }
+
+                $cursor->addMinutes($slotStep);
+            }
+        }
+
+        return null;
     }
 
     public function claim_add_post(Request $request): JsonResponse
@@ -434,56 +584,61 @@ class StockAdminController extends Controller
             'start_time' => 'required|date_format:H:i',
         ]);
 
+        $booked = false;
+
         $bdate = Carbon::createFromFormat('Y-m-d', $validated['booking_date']);
+        $time_slot = $this->findGateAndTimeSlot($bdate, $validated['start_time'], ceil($validated['pallets_count'] / 60) * 60, $validated['gbort']);
 
-        $validated['purpose'] = '';
-        $validated['acceptances_id'] = 1;
-        # $validated['expeditor_id'] = null;
-//        $gate = $this->bookingService->findRandomSlotForInterval(
-//            $validated['booking_date'],
-//            $validated['pallets_count'],
-//            $validated['gbort'],
-//            $validated['start_time']
-//        );
+        if($time_slot) {
+            $validated['purpose'] = '';
+            $validated['acceptances_id'] = 1;
 
-        $requiredHours = $this->bookingService->calculateRequiredHoursTime($validated['pallets_count']);
+            $booked = true;
 
-        $gate_arr = Gate::all()->toArray();
-        $gate = array_rand($gate_arr);
-        $gate = $gate_arr[$gate];
+            $_ = explode(':', $time_slot['start']);
+            $_end = explode(':', $time_slot['end']);
 
-        $booked = true;
+            $date = $bdate;
+            $startTimeSms = $bdate->setHour((int)$_[0])->setMinute((int)$_[1])->setSecond(0)->format('H:i');
+            $startTime = $bdate->setHour((int)$_[0])->setMinute((int)$_[1])->setSecond(0)->format('H:i:s');
+            $end_time = $bdate->setHour((int)$_end[0])->setMinute((int)$_end[1])->setSecond(0)->format('H:i:s');
 
-        $_ = explode(':', $validated['start_time']);
+            // Создаем бронь
+            $booking = new GateBooking();
+            $booking->gate_id = $time_slot['gate_id'];
+            $booking->booking_date = $date->format('Y-m-d');
+            $booking->start_time = $startTime;
+            $booking->end_time = $end_time;
+            $booking->pallets_count = $validated['pallets_count'];
+            $booking->weight = $validated['weight'];
+            $booking->purpose = $validated['purpose'];
+            $booking->car_number = $validated['car_number'];
+            $booking->acceptances_id = $validated['acceptances_id'];
+            $booking->gbort = $validated['gbort'];
+            $booking->car_type_id = $validated['car_type_id'];
+            $booking->driver_id = $validated['driver_id'] ?? null;
+            $booking->user_id = $validated['supplier_id'];
+            $booking->expeditor_id = $validated['expeditor_id'] ?? null;
+            $booking->is_internal = $validated['is_internal'] ?? false;
+            $booking->car_status_id = 10;
+            $booking->save();
 
-        $date = $bdate;
-        $startTime = $bdate->setHour((int)$_[0])->setMinute((int)$_[1])->setSecond(0);
+            if($validated['driver_id']){
+                $driver = Driver::find($validated['driver_id']);
+                $gate = Gate::find($time_slot['gate_id']);
+                SmsService::send($driver->phone,
+                    'Создана заявка на логистику №' . $booking->id
+                    . (($validated['car_number']) ? ', авто ' . $validated['car_number'] : '')
+                    . ', время ' . $date->format('Y-m-d') . ' ' . $startTimeSms
+                    . ', ворота ' . $gate->number);
+            }
 
-        // Создаем бронь
-        $booking = new GateBooking();
-        $booking->gate_id = $gate['id'];
-        $booking->booking_date = $date;
-        $booking->start_time = $startTime->format('H:i:s');
-        $booking->end_time = $startTime->copy()->addHours($requiredHours)->format('H:i:s');
-        $booking->pallets_count = $validated['pallets_count'];
-        $booking->weight = $validated['weight'];
-        $booking->purpose = $validated['purpose'];
-        $booking->car_number = $validated['car_number'];
-        $booking->acceptances_id = $validated['acceptances_id'];
-        $booking->gbort = $validated['gbort'];
-        $booking->car_type_id = $validated['car_type_id'];
-        $booking->driver_id = $validated['driver_id'] ?? null;
-        $booking->user_id = $validated['supplier_id'];
-        $booking->expeditor_id = $validated['expeditor_id'] ?? null;
-        $booking->is_internal = $validated['is_internal'] ?? false;
-        $booking->car_status_id = 10;
-
-        $booking->save();
+        }
 
 
         if (!$booked) {
             return response()->json([
-                'message' => 'Не удалось найти свободные ворота на указанную дату'
+                'message' => 'Не удалось найти свободные ворота на указанную дату и время'
             ], 422);
         }
 

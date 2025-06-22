@@ -122,7 +122,7 @@ return new class extends Migration
         foreach($driverLicenseCategories as $driverLicenseCategory => $driverLicenseCategoryArr) {
             $new = new DriverLicenseCategory;
             $new->literal = $driverLicenseCategory;
-            $new->fill($driverLicenseCategoryArr);
+            $new->forceFill($driverLicenseCategoryArr);
             $new->save();
             if(in_array($new->literal, $disable_arr)){
                 $new->delete();

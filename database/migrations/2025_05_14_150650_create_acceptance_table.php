@@ -28,7 +28,7 @@ return new class extends Migration
 
         foreach($acceptances as $acceptance) {
             $acceptance_obj = new Acceptance();
-            $acceptance_obj->fill([
+            $acceptance_obj->forceFill([
                 'name' => $acceptance['name'],
                 'comment' => $acceptance['comment'],
                 'created_at' => now(),

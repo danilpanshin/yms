@@ -37,7 +37,7 @@ return new class extends Migration
             'updated_at' => now(),
         ];
         $car_type = new CarType();
-        $car_type->fill($car_type_arr);
+        $car_type->forceFill($car_type_arr);
         $car_type->save();
     }
 

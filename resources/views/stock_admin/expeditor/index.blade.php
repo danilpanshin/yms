@@ -40,7 +40,7 @@
                 </div>
             </div>
 
-            <div class="col-12 col-sm-10">
+            <div class="col-12 col-sm-8">
                 <form action="" method="get" id="search_form">
                     <div class="input-group">
                         <div class="input-group-text">Текст</div>

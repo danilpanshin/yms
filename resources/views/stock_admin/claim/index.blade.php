@@ -24,6 +24,13 @@
                                 <option @if((int)$search_gate == $gate['id']) selected @endif value="{{ $gate['id'] }}">{{ $gate['name'] }}</option>
                             @endforeach
                         </select>
+                        <div class="input-group-text">Статус</div>
+                        <select class="form-select" name="cs">
+                            <option value=""> - </option>
+                            @foreach($car_statuses as $car_status)
+                                <option @if((int)$search_car_status == $car_status['id']) selected @endif value="{{ $car_status['id'] }}">{{ $car_status['name'] }}</option>
+                            @endforeach
+                        </select>
                         <input type="submit" class="btn btn-success" value="Поиск">
                         <input type="reset" class="btn btn-warning" onclick="document.location.href = '{{ route('stock_admin.claim') }}'; return false;" value="Сбросить">
                     </div>
@@ -56,6 +63,7 @@
                     <td>Г/Б</td>
                     <td>Масса</td>
                     <td>Ворота</td>
+                    <td>РС ID</td>
                 </tr>
                 </thead>
                 <tbody>
@@ -73,6 +81,7 @@
                         <td>{!! $row['gbort'] ? '<span class="badge bg-success">Да</span>' : '<span class="badge bg-warning">Нет</span>' !!}</td>
                         <td>{{ $row['weight'] }}</td>
                         <td>{{ $row['gate_name'] }}</td>
+                        <td>{{ $row['rs_id'] }}</td>
 {{--                        <td>--}}
 {{--                            <a href="#" class="btn btn-sm btn-secondary"><i class="bi bi-eye"></i></a>--}}
 {{--                        </td>--}}

@@ -13,6 +13,6 @@ class BaseModel extends Model
 
     public function getActivitylogOptions(): LogOptions
     {
-        return LogOptions::defaults()->logAll();
+        return LogOptions::defaults()->logAll()->useLogName('class');
     }
 }

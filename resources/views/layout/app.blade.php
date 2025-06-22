@@ -101,7 +101,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link @if(request()->routeIs('stock_admin.supplier')) active @endif" aria-current="page"
+                            <a class="nav-link @if(request()->routeIs(['stock_admin.supplier', 'stock_admin.supplier.add'])) active @endif" aria-current="page"
                                href="{{ route('stock_admin.supplier') }}">Поставщики</a>
                         </li>
 

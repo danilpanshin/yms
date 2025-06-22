@@ -14,17 +14,17 @@
                 <form action="" method="get" id="search_form">
                     <div class="input-group">
                         <div class="input-group-text">Текст</div>
-                        <input name="s" type="text" class="form-control" id="autoSizingInputGroup" placeholder="Поставщик, Водитель, Экспедитор, Номер ТС" value="{{ $search_text }}">
+                        <input name="s" type="text" class="form-control" id="autoSizingInputGroup" placeholder="Поиск" value="{{ $search_text }}">
                         <input type="submit" class="btn btn-success" value="Поиск">
                         <input type="reset" class="btn btn-warning" onclick="document.location.href = '{{ route('stock_admin.supplier') }}'; return false;" value="Сбросить">
                     </div>
                 </form>
             </div>
-            <div class="col-12 col-sm-2 text-end">
-                <a href="{{ route('stock_admin.supplier.add') }}" class="btn btn-primary">
-                    Добавить
-                </a>
-            </div>
+{{--            <div class="col-12 col-sm-2 text-end">--}}
+{{--                <a href="{{ route('stock_admin.supplier.add') }}" class="btn btn-primary">--}}
+{{--                    Добавить--}}
+{{--                </a>--}}
+{{--            </div>--}}
         </div>
 
         <div class="row mt-4">

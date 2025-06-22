@@ -31,15 +31,15 @@ return new class extends Migration
             ['id' => 60,'name' => 'Отменено', 'slug' => 'canceled'],
         ];
         foreach($statuses as $status){
-            $car_status = new CarStatus();
-            $car_status->fill([
+            $new = new CarStatus;
+            $new->forceFill([
                 'id' => $status['id'],
                 'name' => $status['name'],
                 'slug' => $status['slug'],
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
-            $car_status->save();
+            $new->save();
         }
     }
 
