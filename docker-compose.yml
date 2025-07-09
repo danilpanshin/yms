@@ -8,6 +8,9 @@ services:
     working_dir: /var/www/html
     volumes:
       - ./:/var/www/html
+      - ./docker/app/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+      - ./docker/app/error_reporting.ini:/usr/local/etc/php/conf.d/error_reporting.ini
+      - ./docker/app/memory_limit.ini:/usr/local/etc/php/conf.d/memory_limit.ini
     networks:
       - laravel-network
     depends_on:
@@ -19,7 +22,7 @@ services:
     container_name: ${APP_NAME}-webserver
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "89:80"
     volumes:
       - ./:/var/www/html
       - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
@@ -48,7 +51,7 @@ services:
     image: redis:alpine
     container_name: ${APP_NAME}-redis
     ports:
-      - "127.0.0.1:6379:6379"
+      - "127.0.0.1:6389:6379"
     volumes:
       - ./docker/redis/data:/data
     networks:
