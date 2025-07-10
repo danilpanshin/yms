@@ -154,7 +154,7 @@ deploy-dev-job:
     CICD_PROJECT_ENABLE_DEBUG: "true"
 
   only:
-    - test
+    - stage
 
   stage: deploy-dev
   script:
