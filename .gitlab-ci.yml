@@ -13,7 +13,6 @@ deploy-prod-job:
     - master
   stage: deploy-prod
   script:
-    - echo website $CICD_PROJECT_URL
     - echo "Set vars"
     - CICD_PATH="/var/www/gitlab-runner"
     - CICD_MYSQL_HOST='127.0.0.1'
@@ -21,6 +20,7 @@ deploy-prod-job:
     - CICD_MYSQL_DATABASE="cicd_${CICD_PROJECT_NAME}_${CI_COMMIT_BRANCH}"
     - echo $CICD_MYSQL_DATABASE
     - CICD_PROJECT_URL="${CICD_PROJECT_NAME}-${CI_COMMIT_BRANCH}.ad.3l.ru"
+    - echo website $CICD_PROJECT_URL
     - echo "Set vars END"
     - echo "========================================================="
     - echo "First run scripts execute"
@@ -157,7 +157,6 @@ deploy-dev-job:
 
   stage: deploy-dev
   script:
-    - echo website $CICD_PROJECT_URL
     - echo "Set vars"
     - CICD_PATH="/var/www/gitlab-runner"
     - CICD_MYSQL_HOST='127.0.0.1'
@@ -165,6 +164,7 @@ deploy-dev-job:
     - CICD_MYSQL_DATABASE="cicd_${CICD_PROJECT_NAME}_${CI_COMMIT_BRANCH}"
     - echo $CICD_MYSQL_DATABASE
     - CICD_PROJECT_URL="${CICD_PROJECT_NAME}-${CI_COMMIT_BRANCH}.ad.3l.ru"
+    - echo website $CICD_PROJECT_URL
     - echo "Set vars END"
     - echo "========================================================="
     - echo "First run scripts execute"
