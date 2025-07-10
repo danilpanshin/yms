@@ -8,7 +8,7 @@
         $edit_route = 'supplier.driver.edit_post';
         $delete_route = 'supplier.driver.delete_post';
         $restore_route = 'supplier.driver.restore_post';
-        $view_route = 'supplier.driver.one';
+        $view_route = 'stock_admin.driver.one';
         function delete_confirm($name, $id): void { echo "Вы действительно хотите перенести в архив водителя {$name} под номером {$id}"; }
         function restore_confirm($name, $id): void { echo "Вы действительно хотите восстановить водителя {$name} под номером {$id}"; }
         $list_arr = $users ?? ($list_arr ?? []);
@@ -50,11 +50,11 @@
                     </div>
                 </form>
             </div>
-{{--            <div class="col-12 col-sm-2 text-end">--}}
-{{--                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">--}}
-{{--                    Добавить--}}
-{{--                </button>--}}
-{{--            </div>--}}
+            <div class="col-12 col-sm-2 text-end">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
+                    Добавить
+                </button>
+            </div>
 
             <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered modal-xl">
@@ -230,11 +230,11 @@
                 let ff = $('#editModal');
                 $(ff).find('.edit_field_id').val(data.id);
                 @foreach($edit_row_cols as $edit_row_col_name)
-                @if(in_array($row_cols[$edit_row_col_name]['type'], ['text', 'email']))
-                $(ff).find('.edit_field_{{ $edit_row_col_name }}').val(data.{{ $edit_row_col_name }});
-                @elseif($row_cols[$edit_row_col_name]['type'] == 'textarea')
-                $(ff).find('.edit_field_{{ $edit_row_col_name }}').text(data.{{ $edit_row_col_name }});
-                @endif
+                    @if(in_array($row_cols[$edit_row_col_name]['type'], ['text', 'email']))
+                        $(ff).find('.edit_field_{{ $edit_row_col_name }}').val(data.{{ $edit_row_col_name }});
+                    @elseif($row_cols[$edit_row_col_name]['type'] == 'textarea')
+                        $(ff).find('.edit_field_{{ $edit_row_col_name }}').text(data.{{ $edit_row_col_name }});
+                    @endif
                 @endforeach
                 $(ff).find('.edit_loader').hide();
                 $(ff).find('form').show();
