@@ -1,0 +1,291 @@
+variables:
+  CICD_PROJECT_NAME: "ymp"
+stages:
+  - deploy-prod
+  - deploy-dev
+deploy-prod-job:
+  tags:
+      - common-prod
+      
+  variables:
+    CICD_PROJECT_ENABLE_DEBUG: "false"
+  only:
+    - master
+  stage: deploy-prod
+  script:
+    - echo website $CICD_PROJECT_URL
+    - echo "Set vars"
+    - CICD_PATH="/var/www/gitlab-runner"
+    - CICD_MYSQL_HOST='127.0.0.1'
+    - CICD_MYSQL_USER="cicd_${CICD_PROJECT_NAME}_${CI_COMMIT_BRANCH}"
+    - CICD_MYSQL_DATABASE="cicd_${CICD_PROJECT_NAME}_${CI_COMMIT_BRANCH}"
+    - echo $CICD_MYSQL_DATABASE
+    - CICD_PROJECT_URL="${CICD_PROJECT_NAME}-${CI_COMMIT_BRANCH}.ad.3l.ru"
+    - echo "Set vars END"
+    - echo "========================================================="
+    - echo "First run scripts execute"
+    - mkdir -p $CICD_PATH/$CICD_PROJECT_URL/assets/cache
+    - mkdir -p $CICD_PATH/$CICD_PROJECT_URL/assets/logs
+    - mkdir -p $CICD_PATH/$CICD_PROJECT_URL/assets/sessions
+    - mkdir -p $CICD_PATH/$CICD_PROJECT_URL/assets/files
+    - chmod 0777 $CICD_PATH/$CICD_PROJECT_URL/assets/cache
+    - chmod 0777 $CICD_PATH/$CICD_PROJECT_URL/assets/logs
+    - chmod 0777 $CICD_PATH/$CICD_PROJECT_URL/assets/sessions
+    - chmod 0777 $CICD_PATH/$CICD_PROJECT_URL/assets/files
+    - cd $CICD_PATH/$CICD_PROJECT_URL/
+    - '[[ ! -f ./.pass_db_password ]] && echo -e `pwgen -s 32 1` > ./.pass_db_password'
+    - CICD_MYSQL_PASSWORD=`cat ./.pass_db_password`
+    - '[[ ! -f ./.pass_sms_token ]] && echo -e `pwgen -s 32 1` > ./.pass_sms_token'
+    - CICD_SMS_TOKEN=`cat ./.pass_sms_token`
+    - mysql -ugitlab-runner -p$COMMON_PROD_GR_MYSQL_PASSWORD -e"CREATE DATABASE IF NOT EXISTS $CICD_MYSQL_DATABASE"
+    - mysql -ugitlab-runner -p$COMMON_PROD_GR_MYSQL_PASSWORD -e"CREATE USER IF NOT EXISTS $CICD_MYSQL_USER@'127.0.0.1' IDENTIFIED BY '$CICD_MYSQL_PASSWORD'"
+    - mysql -ugitlab-runner -p$COMMON_PROD_GR_MYSQL_PASSWORD -e"GRANT ALL PRIVILEGES ON $CICD_MYSQL_DATABASE.* TO $CICD_MYSQL_USER@'127.0.0.1'"
+    - echo "First run scripts execute END"
+    - echo "========================================================="
+    - echo "Deploy"
+    - rm -Rf ./new
+    - cp -r $CI_PROJECT_DIR ./new
+    - |
+      cat > ./new/.env << EOF 
+        APP_NAME=Laravel
+        APP_ENV=local
+        APP_KEY=base64:ik21fhMN4NVGaNBb8PTPub6eTJiOQtbPee2kFQAxUbg=
+        APP_DEBUG=__CICD_PROJECT_ENABLE_DEBUG__
+        APP_URL=___CICD_PROJECT_URL___
+
+        APP_LOCALE=ru
+        APP_FALLBACK_LOCALE=ru
+        APP_FAKER_LOCALE=ru_RU
+
+        APP_MAINTENANCE_DRIVER=file
+        # APP_MAINTENANCE_STORE=database
+
+        PHP_CLI_SERVER_WORKERS=4
+
+        BCRYPT_ROUNDS=12
+
+        LOG_CHANNEL=stack
+        LOG_STACK=single
+        LOG_DEPRECATIONS_CHANNEL=null
+        LOG_LEVEL=debug
+
+        DB_CONNECTION=mysql
+        DB_HOST=___CICD_MYSQL_HOST___
+        DB_PORT=3306
+        DB_DATABASE=___CICD_MYSQL_DATABASE___
+        DB_USERNAME=___CICD_MYSQL_USER___
+        DB_PASSWORD=___CICD_MYSQL_PASSWORD___
+
+        #FIREBIRD_HOST=10.2.8.220
+        #FIREBIRD_USERNAME=SYSDBA
+        #FIREBIRD_PASSWORD=masterkey
+        #FIREBIRD_DATABASE=stage
+
+        FIREBIRD_HOST=10.2.8.21
+        FIREBIRD_USERNAME=SYSDBA
+        FIREBIRD_PASSWORD=masterkey
+        FIREBIRD_DATABASE=rsmain
+
+        SESSION_DRIVER=database
+        SESSION_LIFETIME=120
+        SESSION_ENCRYPT=false
+        SESSION_PATH=/
+        SESSION_DOMAIN=null
+
+        BROADCAST_CONNECTION=log
+        FILESYSTEM_DISK=local
+        QUEUE_CONNECTION=database
+
+        CACHE_STORE=database
+        # CACHE_PREFIX=
+
+        MEMCACHED_HOST=127.0.0.1
+
+        REDIS_CLIENT=phpredis
+        REDIS_HOST=127.0.0.1
+        REDIS_PASSWORD=null
+        REDIS_PORT=6379
+
+        MAIL_MAILER=log
+        MAIL_SCHEME=null
+        MAIL_HOST=127.0.0.1
+        MAIL_PORT=2525
+        MAIL_USERNAME=null
+        MAIL_PASSWORD=null
+        MAIL_FROM_ADDRESS="hello@example.com"
+        MAIL_FROM_NAME="${APP_NAME}"
+
+        AWS_ACCESS_KEY_ID=
+        AWS_SECRET_ACCESS_KEY=
+        AWS_DEFAULT_REGION=us-east-1
+        AWS_BUCKET=
+        AWS_USE_PATH_STYLE_ENDPOINT=false
+
+        VITE_APP_NAME="${APP_NAME}"
+
+        SMS_TOKEN=___CICD_SMS_TOKEN___
+        SMS_URL=https://api.unisender.com/ru/api/sendSms
+        SMS_FORMAT=json
+        SMS_SENDER=3Logic
+      EOF
+    - sed -i -e "s/___CICD_MYSQL_DATABASE___/$CICD_MYSQL_DATABASE/g" ./new/.env
+    - sed -i -e "s/___CICD_MYSQL_USER___/$CICD_MYSQL_USER/g" ./new/.env
+    - sed -i -e "s/___CICD_MYSQL_PASSWORD___/$CICD_MYSQL_PASSWORD/g" ./new/.env
+    - sed -i -e "s/__CICD_PROJECT_ENABLE_DEBUG__/$CICD_PROJECT_ENABLE_DEBUG/g" ./new/.env
+    - sed -i -e "s/___CICD_MYSQL_HOST___/$CICD_MYSQL_HOST/g" ./new/.env
+    - sed -i -e "s/___CICD_PROJECT_URL___/$CICD_PROJECT_URL/g" ./new/.env
+    - sed -i -e "s/___CICD_SMS_TOKEN___/$CICD_SMS_TOKEN/g" ./new/.env
+    - cd ./new/public
+    - cd $CICD_PATH/$CICD_PROJECT_URL/
+    - '[[ -d ./current ]] && mv ./current ./old'
+    - mv ./new ./current
+    - rm -Rf ./old
+    - cd $CICD_PATH/$CICD_PROJECT_URL/new
+    - /usr/bin/php82 /usr/bin/composer install
+    - /usr/bin/php82 artisan migrate
+    - echo "Application successfully deployed."
+    
+    
+deploy-dev-job:
+  tags:
+      - common-dev
+      
+  variables:
+    CICD_PROJECT_ENABLE_DEBUG: "true"
+
+  only:
+    - test
+
+  stage: deploy-dev
+  script:
+    - echo website $CICD_PROJECT_URL
+    - echo "Set vars"
+    - CICD_PATH="/var/www/gitlab-runner"
+    - CICD_MYSQL_HOST='127.0.0.1'
+    - CICD_MYSQL_USER="cicd_${CICD_PROJECT_NAME}_${CI_COMMIT_BRANCH}"
+    - CICD_MYSQL_DATABASE="cicd_${CICD_PROJECT_NAME}_${CI_COMMIT_BRANCH}"
+    - echo $CICD_MYSQL_DATABASE
+    - CICD_PROJECT_URL="${CICD_PROJECT_NAME}-${CI_COMMIT_BRANCH}.ad.3l.ru"
+    - echo "Set vars END"
+    - echo "========================================================="
+    - echo "First run scripts execute"
+    - mkdir -p $CICD_PATH/$CICD_PROJECT_URL/assets/cache
+    - mkdir -p $CICD_PATH/$CICD_PROJECT_URL/assets/logs
+    - mkdir -p $CICD_PATH/$CICD_PROJECT_URL/assets/sessions
+    - mkdir -p $CICD_PATH/$CICD_PROJECT_URL/assets/files
+    - chmod 0777 $CICD_PATH/$CICD_PROJECT_URL/assets/cache
+    - chmod 0777 $CICD_PATH/$CICD_PROJECT_URL/assets/logs
+    - chmod 0777 $CICD_PATH/$CICD_PROJECT_URL/assets/sessions
+    - chmod 0777 $CICD_PATH/$CICD_PROJECT_URL/assets/files
+    - cd $CICD_PATH/$CICD_PROJECT_URL/
+    - '[[ ! -f ./.pass_db_password ]] && echo -e `pwgen -s 32 1` > ./.pass_db_password'
+    - CICD_MYSQL_PASSWORD=`cat ./.pass_db_password`
+    - '[[ ! -f ./.pass_sms_token ]] && echo -e `pwgen -s 32 1` > ./.pass_sms_token'
+    - CICD_SMS_TOKEN=`cat ./.pass_sms_token`
+    - mysql -ugitlab-runner -p$COMMON_PROD_GR_MYSQL_PASSWORD -e"CREATE DATABASE IF NOT EXISTS $CICD_MYSQL_DATABASE"
+    - mysql -ugitlab-runner -p$COMMON_PROD_GR_MYSQL_PASSWORD -e"CREATE USER IF NOT EXISTS $CICD_MYSQL_USER@'127.0.0.1' IDENTIFIED BY '$CICD_MYSQL_PASSWORD'"
+    - mysql -ugitlab-runner -p$COMMON_PROD_GR_MYSQL_PASSWORD -e"GRANT ALL PRIVILEGES ON $CICD_MYSQL_DATABASE.* TO $CICD_MYSQL_USER@'127.0.0.1'"
+    - echo "First run scripts execute END"
+    - echo "========================================================="
+    - echo "Deploy"
+    - rm -Rf ./new
+    - cp -r $CI_PROJECT_DIR ./new
+    - |
+      cat > ./new/.env << EOF 
+        APP_NAME=Laravel
+        APP_ENV=local
+        APP_KEY=base64:ik21fhMN4NVGaNBb8PTPub6eTJiOQtbPee2kFQAxUbg=
+        APP_DEBUG=__CICD_PROJECT_ENABLE_DEBUG__
+        APP_URL=___CICD_PROJECT_URL___
+
+        APP_LOCALE=ru
+        APP_FALLBACK_LOCALE=ru
+        APP_FAKER_LOCALE=ru_RU
+
+        APP_MAINTENANCE_DRIVER=file
+        # APP_MAINTENANCE_STORE=database
+
+        PHP_CLI_SERVER_WORKERS=4
+
+        BCRYPT_ROUNDS=12
+
+        LOG_CHANNEL=stack
+        LOG_STACK=single
+        LOG_DEPRECATIONS_CHANNEL=null
+        LOG_LEVEL=debug
+
+        DB_CONNECTION=mysql
+        DB_HOST=___CICD_MYSQL_HOST___
+        DB_PORT=3306
+        DB_DATABASE=___CICD_MYSQL_DATABASE___
+        DB_USERNAME=___CICD_MYSQL_USER___
+        DB_PASSWORD=___CICD_MYSQL_PASSWORD___
+
+        #FIREBIRD_HOST=10.2.8.220
+        #FIREBIRD_USERNAME=SYSDBA
+        #FIREBIRD_PASSWORD=masterkey
+        #FIREBIRD_DATABASE=stage
+
+        FIREBIRD_HOST=10.2.8.21
+        FIREBIRD_USERNAME=SYSDBA
+        FIREBIRD_PASSWORD=masterkey
+        FIREBIRD_DATABASE=rsmain
+
+        SESSION_DRIVER=database
+        SESSION_LIFETIME=120
+        SESSION_ENCRYPT=false
+        SESSION_PATH=/
+        SESSION_DOMAIN=null
+
+        BROADCAST_CONNECTION=log
+        FILESYSTEM_DISK=local
+        QUEUE_CONNECTION=database
+
+        CACHE_STORE=database
+        # CACHE_PREFIX=
+
+        MEMCACHED_HOST=127.0.0.1
+
+        REDIS_CLIENT=phpredis
+        REDIS_HOST=127.0.0.1
+        REDIS_PASSWORD=null
+        REDIS_PORT=6379
+
+        MAIL_MAILER=log
+        MAIL_SCHEME=null
+        MAIL_HOST=127.0.0.1
+        MAIL_PORT=2525
+        MAIL_USERNAME=null
+        MAIL_PASSWORD=null
+        MAIL_FROM_ADDRESS="hello@example.com"
+        MAIL_FROM_NAME="${APP_NAME}"
+
+        AWS_ACCESS_KEY_ID=
+        AWS_SECRET_ACCESS_KEY=
+        AWS_DEFAULT_REGION=us-east-1
+        AWS_BUCKET=
+        AWS_USE_PATH_STYLE_ENDPOINT=false
+
+        VITE_APP_NAME="${APP_NAME}"
+
+        SMS_TOKEN=___CICD_SMS_TOKEN___
+        SMS_URL=https://api.unisender.com/ru/api/sendSms
+        SMS_FORMAT=json
+        SMS_SENDER=3Logic
+      EOF
+    - sed -i -e "s/___CICD_MYSQL_DATABASE___/$CICD_MYSQL_DATABASE/g" ./new/.env
+    - sed -i -e "s/___CICD_MYSQL_USER___/$CICD_MYSQL_USER/g" ./new/.env
+    - sed -i -e "s/___CICD_MYSQL_PASSWORD___/$CICD_MYSQL_PASSWORD/g" ./new/.env
+    - sed -i -e "s/__CICD_PROJECT_ENABLE_DEBUG__/$CICD_PROJECT_ENABLE_DEBUG/g" ./new/.env
+    - sed -i -e "s/___CICD_MYSQL_HOST___/$CICD_MYSQL_HOST/g" ./new/.env
+    - sed -i -e "s/___CICD_PROJECT_URL___/$CICD_PROJECT_URL/g" ./new/.env
+    - sed -i -e "s/___CICD_SMS_TOKEN___/$CICD_SMS_TOKEN/g" ./new/.env
+    - cd ./new/public
+    - cd $CICD_PATH/$CICD_PROJECT_URL/
+    - '[[ -d ./current ]] && mv ./current ./old'
+    - mv ./new ./current
+    - rm -Rf ./old
+    - cd $CICD_PATH/$CICD_PROJECT_URL/new
+    - /usr/bin/php82 /usr/bin/composer install
+    - /usr/bin/php82 artisan migrate
+    - echo "Application successfully deployed."
