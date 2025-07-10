@@ -225,10 +225,10 @@ deploy-dev-job:
         #FIREBIRD_PASSWORD=masterkey
         #FIREBIRD_DATABASE=stage
 
-        FIREBIRD_HOST=10.2.8.21
+        FIREBIRD_HOST=10.2.8.220
         FIREBIRD_USERNAME=SYSDBA
         FIREBIRD_PASSWORD=masterkey
-        FIREBIRD_DATABASE=rsmain
+        FIREBIRD_DATABASE=stage
 
         SESSION_DRIVER=database
         SESSION_LIFETIME=120
