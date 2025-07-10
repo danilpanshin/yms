@@ -5,7 +5,7 @@ stages:
   - deploy-dev
 deploy-prod-job:
   tags:
-      - common-prod
+    - common-prod
       
   variables:
     CICD_PROJECT_ENABLE_DEBUG: "false"
@@ -148,7 +148,7 @@ deploy-prod-job:
     
 deploy-dev-job:
   tags:
-      - common-dev
+    - common-dev
       
   variables:
     CICD_PROJECT_ENABLE_DEBUG: "true"
