@@ -266,13 +266,12 @@ class StockAdminController extends Controller
         $validated = $request->validate([
             'name' => 'required|max:255',
             'phone' => 'required',
+            'additional_phone' => 'nullable|string',
             'license_id' => 'required',
             'email' => 'required|email',
             'sid' => 'integer|exists:suppliers,id',
         ]);
-        $new = (new Driver())->fill($validated);
-        $new->user_id = $validated['sid'] ?? null;
-        $new->save();
+        $this->supplierService->driver_add($validated);
         if($request->ajax()){
             return AjaxJsonResponse::make('ok');
         }
