@@ -15,6 +15,7 @@ use App\Services\GateBookingService;
 use App\Models\Expeditor;
 use App\Models\GateBooking;
 use App\Services\SmsService;
+use App\Services\SupplierService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
@@ -28,10 +29,12 @@ class StockAdminController extends Controller
 {
 
     protected GateBookingService $bookingService;
+    protected SupplierService $supplierService;
 
     public function __construct()
     {
         $this->bookingService = new GateBookingService();
+        $this->supplierService = new SupplierService();
     }
 
     public function index(){
@@ -287,8 +290,22 @@ class StockAdminController extends Controller
         return redirect()->back();
     }
 
-    public function driver_edit_post($id, Request $request){
+    public function driver_edit_post(Request $request, int $id = null){
+        $id = $request->id ?? $id ?? null;
 
+        $validated = $request->validate([
+            'id' => 'integer',
+            'name' => 'required|max:255',
+            'phone' => '',
+            'additional_phone' => '',
+            'license_id' => '',
+            'email' => 'required|email',
+        ]);
+        $validated['id'] = $id;
+        $this->supplierService->driver_edit($validated);
+        if($request->ajax()){
+            return AjaxJsonResponse::make('ok');
+        }
         return redirect()->back();
     }
 

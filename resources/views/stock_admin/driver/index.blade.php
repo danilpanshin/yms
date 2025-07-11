@@ -4,10 +4,10 @@
 
 @section('content')
     @php
-        $add_route = 'supplier.driver.add_post';
-        $edit_route = 'supplier.driver.edit_post';
-        $delete_route = 'supplier.driver.delete_post';
-        $restore_route = 'supplier.driver.restore_post';
+        $add_route = 'stock_admin.driver.add_post';
+        $edit_route = 'stock_admin.driver.edit_post';
+        $delete_route = 'stock_admin.driver.delete_post';
+        $restore_route = 'stock_admin.driver.restore_post';
         $view_route = 'stock_admin.driver.one';
         function delete_confirm($name, $id): void { echo "Вы действительно хотите перенести в архив водителя {$name} под номером {$id}"; }
         function restore_confirm($name, $id): void { echo "Вы действительно хотите восстановить водителя {$name} под номером {$id}"; }
@@ -17,13 +17,14 @@
             'name' => ['type' => 'text', 'width' => false, 'label' => 'ФИО водителя'],
             'license_id' => ['type' => 'text', 'width' => 200, 'label' => 'Номер вод. прав'],
             'phone' => ['type' => 'text', 'width' => 250, 'label' => 'Номер тел. водителя'],
+            'additional_phone' => ['type' => 'text', 'width' => 250, 'label' => 'Доп. номер тел. водителя'],
             'email' => ['type' => 'email', 'width' => 400, 'label' => 'Email водителя'],
             'supplier_name' => ['type' => 'text', 'width' => false, 'label' => 'Поставщик']
         ];
         $add_row_cols = ['name', 'email', 'license_id', 'phone'];
-        $list_row_cols = ['id', 'name', 'supplier_name', 'email', 'license_id', 'phone'];
-        $edit_row_cols = ['name', 'email', 'license_id', 'phone'];
-        $view_row_cols = ['id', 'name', 'email', 'license_id', 'phone'];
+        $list_row_cols = ['id', 'name', 'supplier_name', 'email', 'license_id', 'phone', 'additional_phone'];
+        $edit_row_cols = ['name', 'email', 'license_id', 'phone', 'additional_phone'];
+        $view_row_cols = ['id', 'name', 'email', 'license_id', 'phone', 'additional_phone'];
     @endphp
     <div class="admin_users_section">
         <div class="row">
@@ -104,7 +105,7 @@
                             <form action="{{ route($restore_route, $row['id']) }}" method="post" class="restoreForm">
                                 @csrf
                             </form>
-                            <a title="Показать одну запиь" class="view_btn btn btn-sm btn-primary me-1" data-bs-toggle="modal" data-bs-target="#viewModal" data-id="{{ $row['id'] }}"><i class="bi bi-eye"></i></a>
+                            <a title="Показать одну запись" class="view_btn btn btn-sm btn-primary me-1" data-bs-toggle="modal" data-bs-target="#viewModal" data-id="{{ $row['id'] }}"><i class="bi bi-eye"></i></a>
                             <a title="Редактировать" class="edit_btn btn btn-sm btn-secondary mx-1" data-bs-toggle="modal" data-bs-target="#editModal" data-id="{{ $row['id'] }}"><i class="bi bi-pencil"></i></a>
                             @if($row['deleted_at'])
                                 <a title="Восстановить" class="btn btn-sm btn-danger ms-4" onclick="if(confirm('@php restore_confirm($row['name'], $row['id']) @endphp')){ $('.restoreForm').submit(); }">
