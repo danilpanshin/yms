@@ -8,9 +8,10 @@
         'name' => ['type' => 'text', 'width' => 120, 'label' => 'ФИО водителя'],
         'license_id' => ['type' => 'text', 'width' => 200, 'label' => 'Номер водительских прав'],
         'phone' => ['type' => 'text', 'width' => 200, 'label' => 'Номер телефона водителя'],
+        'additional_phone' => ['type' => 'text', 'width' => 200, 'label' => 'Дополнительный номер телефона водителя'],
         'email' => ['type' => 'email', 'width' => 200, 'label' => 'Email водителя'],
     ];
-    $add_row_cols = ['name', 'email', 'license_id', 'phone'];
+    $add_row_cols = ['name', 'email', 'license_id', 'phone', 'additional_phone'];
 @endphp
 <form action="{{ route($add_route) }}" method="post" class="addFormDriver lllAjaxFormSubmit @isset($data){{ $data['lllAjaxFormSubmitName'] }}@endisset">
     @csrf
