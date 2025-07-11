@@ -2,13 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreGateBookingRequest;
 use App\Models\AjaxJsonResponse;
-use App\Models\Car;
 use App\Models\CarStatus;
 use App\Models\Driver;
 use App\Models\FB_Corr;
-use App\Models\FB_SupplierTransport;
 use App\Models\Gate;
 use App\Models\Supplier;
 use App\Services\GateBookingService;
@@ -19,7 +16,6 @@ use App\Services\SupplierService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;

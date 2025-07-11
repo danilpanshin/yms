@@ -77,7 +77,6 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
             Route::get('/', [StockAdminController::class, 'driver'])->name('');
             Route::get('/with_trashed', [StockAdminController::class, 'driver'])->name('.with_trashed');
             Route::get('/one/{id?}', [StockAdminController::class, 'driver_one'])->name('.one');
-            Route::get('/add', [StockAdminController::class, 'driver_add'])->name('.add');
             Route::post('/add', [StockAdminController::class, 'driver_add_post'])->name('.add_post');
             Route::post('/edit/{id?}', [StockAdminController::class, 'driver_edit_post'])->name('.edit_post');
             Route::post('/delete/{id?}', [StockAdminController::class, 'driver_delete_post'])->name('.delete_post');
