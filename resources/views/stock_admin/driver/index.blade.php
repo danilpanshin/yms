@@ -29,11 +29,11 @@
     <div class="admin_users_section">
         <div class="row">
             <div class="col-12 col-sm-2 text-start">
-                @if(Route::currentRouteName() == 'supplier.driver.with_trashed')
-                    <a href="{{ route('supplier.driver') }}" class="btn btn-success">Показать активных</a>
+                @if(Route::currentRouteName() == 'stock_admin.driver.with_trashed')
+                    <a href="{{ route('stock_admin.driver') }}" class="btn btn-success">Показать активных</a>
 
                 @else
-                    <a href="{{ route('supplier.driver.with_trashed') }}" class="btn btn-warning">Показать архив</a>
+                    <a href="{{ route('stock_admin.driver.with_trashed') }}" class="btn btn-warning">Показать архив</a>
 
                 @endif
                 <div>
