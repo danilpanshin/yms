@@ -7,6 +7,7 @@ use Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,5 +26,6 @@ class AppServiceProvider extends ServiceProvider
     {
         Paginator::useBootstrap();
         date_default_timezone_set('Europe/Moscow');
+        URL::forceScheme('https');
     }
 }
