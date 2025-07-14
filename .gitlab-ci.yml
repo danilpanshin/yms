@@ -133,7 +133,7 @@ deploy-prod-job:
     - sed -i -e "s/___CICD_MYSQL_PASSWORD___/$CICD_MYSQL_PASSWORD/g" ./new/.env
     - sed -i -e "s/__CICD_PROJECT_ENABLE_DEBUG__/$CICD_PROJECT_ENABLE_DEBUG/g" ./new/.env
     - sed -i -e "s/___CICD_MYSQL_HOST___/$CICD_MYSQL_HOST/g" ./new/.env
-    - sed -i -e "s/___CICD_PROJECT_URL___/$CICD_PROJECT_URL/g" ./new/.env
+    - sed -i -e "s|___CICD_PROJECT_URL___|https://$CICD_PROJECT_URL|g" ./new/.env
     - sed -i -e "s/___CICD_SMS_TOKEN___/$CICD_SMS_TOKEN/g" ./new/.env
     - cd $CICD_PATH/$CICD_PROJECT_URL/new
     - /usr/bin/php82 /usr/bin/composer install
@@ -277,7 +277,7 @@ deploy-dev-job:
     - sed -i -e "s/___CICD_MYSQL_PASSWORD___/$CICD_MYSQL_PASSWORD/g" ./new/.env
     - sed -i -e "s/__CICD_PROJECT_ENABLE_DEBUG__/$CICD_PROJECT_ENABLE_DEBUG/g" ./new/.env
     - sed -i -e "s/___CICD_MYSQL_HOST___/$CICD_MYSQL_HOST/g" ./new/.env
-    - sed -i -e "s/___CICD_PROJECT_URL___/$CICD_PROJECT_URL/g" ./new/.env
+    - sed -i -e "s|___CICD_PROJECT_URL___|https://$CICD_PROJECT_URL|g" ./new/.env
     - sed -i -e "s/___CICD_SMS_TOKEN___/$CICD_SMS_TOKEN/g" ./new/.env
     - cd $CICD_PATH/$CICD_PROJECT_URL/new
     - /usr/bin/php82 /usr/bin/composer install
