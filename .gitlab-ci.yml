@@ -282,6 +282,11 @@ deploy-dev-job:
     - cd $CICD_PATH/$CICD_PROJECT_URL/new
     - /usr/bin/php82 /usr/bin/composer install
     - /usr/bin/php82 artisan migrate
+    - /usr/bin/php82 artisan cache:clear
+    - /usr/bin/php82 artisan config:clear
+    - /usr/bin/php82 artisan view:clear
+    - /usr/bin/php82 artisan route:clear
+    - /usr/bin/php82 artisan route:list
     - cd $CICD_PATH/$CICD_PROJECT_URL/
     - '[[ -d ./current ]] && mv ./current ./old'
     - mv ./new ./current
