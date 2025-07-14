@@ -13,7 +13,7 @@
     ];
     $add_row_cols = ['name', 'email', 'license_id', 'phone', 'additional_phone'];
 @endphp
-<form action="{{ secure_url(route($add_route)) }}" method="post" class="addFormDriver lllAjaxFormSubmit @isset($data){{ $data['lllAjaxFormSubmitName'] }}@endisset">
+<form action="{{ secure_url(route($add_route, [], false)) }}" method="post" class="addFormDriver lllAjaxFormSubmit @isset($data){{ $data['lllAjaxFormSubmitName'] }}@endisset">
     @csrf
     @foreach($add_row_cols as $row_cols_name)
         @if(in_array($row_cols[$row_cols_name]['type'], ['text', 'email']))
