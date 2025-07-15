@@ -203,7 +203,7 @@
             $(ff).find('.view_data').text('');
             $(ff).find('.view_data').hide();
             $.ajax({
-                url: '{{ route($view_route) }}/' + id,
+                url: '{{ url(route($view_route, [], false)) }}/' + id,
                 headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}
             }).done(function(data) {
                 let ff = $('#viewModal');
