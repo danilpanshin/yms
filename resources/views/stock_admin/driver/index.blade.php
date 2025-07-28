@@ -203,7 +203,7 @@
             $(ff).find('.view_data').text('');
             $(ff).find('.view_data').hide();
             $.ajax({
-                url: '{{ route($view_route) }}/' + id,
+                url: '{{ custom_secure_url(route($view_route, [], false)) }}/' + id,
                 headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}
             }).done(function(data) {
                 let ff = $('#viewModal');
@@ -225,7 +225,7 @@
             let id = $(this).data('id');
             $('.edit_id').text(id);
             $.ajax({
-                url: '{{ route($view_route) }}/' + id,
+                url: '{{ custom_secure_url(route($view_route, [], false)) }}/' + id,
                 headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}
             }).done(function(data) {
                 let ff = $('#editModal');
