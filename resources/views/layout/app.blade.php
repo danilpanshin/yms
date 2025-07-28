@@ -152,7 +152,7 @@
                                 </li>
                             @endif
                             <li>
-                                <form method="POST" id="logout_form" action="{{ route('logout') }}">
+                                <form method="POST" id="logout_form" action="{{ custom_secure_url(route('logout', [], false)) }}">
                                     @csrf
                                 </form>
                                 <a class="dropdown-item" href="#"
