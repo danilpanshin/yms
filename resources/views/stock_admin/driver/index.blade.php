@@ -168,7 +168,7 @@
                             <span class="visually-hidden">Loading...</span>
                         </div>
                     </div>
-                    <form action="{{ custom_secure_url(route($edit_route)) }}" id="editModal" method="post" class="editForm">
+                    <form action="{{ custom_secure_url(route($edit_route, [], false)) }}" id="editModal" method="post" class="editForm">
                         @csrf
                         <input type="hidden" name="id" value="" class="edit_field_id" />
                         @foreach($edit_row_cols as $edit_row_name)
