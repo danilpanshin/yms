@@ -99,10 +99,10 @@
                         @endforeach
 {{--                        <td>@foreach($row['roles'] as $role_row) <span class="badge rounded-pill bg-info">{{ $role_row['name'] }}</span> @endforeach</td>--}}
                         <td>
-                            <form action="{{ custom_secure_url(route($delete_route, $row['id'])) }}" method="post" class="deleteForm">
+                            <form action="{{ custom_secure_url(route($delete_route, $row['id'], false)) }}" method="post" class="deleteForm">
                                 @csrf
                             </form>
-                            <form action="{{ custom_secure_url(route($restore_route, $row['id'])) }}" method="post" class="restoreForm">
+                            <form action="{{ custom_secure_url(route($restore_route, $row['id'], false)) }}" method="post" class="restoreForm">
                                 @csrf
                             </form>
                             <a title="Показать одну запись" class="view_btn btn btn-sm btn-primary me-1" data-bs-toggle="modal" data-bs-target="#viewModal" data-id="{{ $row['id'] }}"><i class="bi bi-eye"></i></a>
