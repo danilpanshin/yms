@@ -37,7 +37,7 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <form action="{{ route($add_route) }}" method="post" class="addForm">
+                            <form action="{{ custom_secure_url(route($add_route, [], false)) }}" method="post" class="addForm">
                                 @csrf
                                 @foreach($add_row_cols as $row_cols_name)
                                     @if(in_array($row_cols[$row_cols_name]['type'], ['text', 'email']))
