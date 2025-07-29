@@ -128,6 +128,8 @@ return [
         'url' => env('SMS_URL', 'https://api.unisender.com/ru/api/sendSms'),
         'format' => env('SMS_FORMAT', 'json'),
         'sender' => env('SMS_SENDER', '3Logic'),
-    ]
+    ],
+
+    'booking_link_expire' => env('BOOKING_LINK_EXPIRE', 1),
 
 ];

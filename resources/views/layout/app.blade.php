@@ -137,6 +137,13 @@
                             </ul>
                         </li>
                     @endif
+                    @if(auth()->check() && auth()->user()->is_manager())
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('manager') }}">
+                                <i class="bi bi-gear"></i> Панель менеджера
+                            </a>
+                        </li>
+                    @endif
                 </ul>
                 <ul class="navbar-nav mb-2 mb-lg-0 ms-lg-4 justify-content-end">
                     <li class="nav-item dropdown">

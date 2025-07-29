@@ -45,6 +45,11 @@ class SupplierController extends Controller
         return view('supplier.claim.add');
     }
 
+    public function claim_add_with_invite(Request $request): View|Application|Factory
+    {
+        return view('supplier.claim.add');
+    }
+
     public function claim(): View|Application|Factory
     {
         return view('supplier.claim.index', [

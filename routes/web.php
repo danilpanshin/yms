@@ -39,6 +39,7 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
     /** MANAGER */
     Route::prefix('manager')->name('manager')->middleware('is_manager')->group(function () {
         Route::get('/', [ManagerController::class, 'index'])->name('');
+        Route::post('/send_invite', [ManagerController::class, 'send_invite'])->name('.send_invite');
     });
     /** END MANAGER */
 
@@ -112,6 +113,7 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
             Route::get('/edit/{id?}', [SupplierController::class, 'claim_edit'])->name('.edit');
             Route::post('/edit/{id?}', [SupplierController::class, 'claim_edit_post'])->name('.edit_post');
             Route::get('/slots', [SupplierController::class, 'findAvailableSlots'])->name('.slots');
+            Route::get('/add_with_invite/{token}', [SupplierController::class, 'claim_add_with_invite'])->name('.add_with_invite')->middleware('booking.token');
         });
 
         Route::prefix('driver')->name('.driver')->group(function () {

@@ -6,6 +6,7 @@ use App\Http\Middleware\CheckIsDriver;
 use App\Http\Middleware\CheckIsManager;
 use App\Http\Middleware\CheckIsStockAdmin;
 use App\Http\Middleware\CheckIsSupplier;
+use App\Http\Middleware\VerifyBookingToken;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -25,6 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'is_manager' => CheckIsManager::class,
             'is_driver' => CheckIsDriver::class,
             'is_admin' => CheckIsAdmin::class,
+            'booking.token' => VerifyBookingToken::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
