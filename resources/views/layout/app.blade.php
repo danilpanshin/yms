@@ -27,6 +27,7 @@
     <script src="/assets/b/js/bootstrap.bundle.min.js"></script>
     <script src="/assets/js/fileinput.min.js"></script>
     <script src="/assets/js/fileinput_locales.js"></script>
+    <script src="{{ asset('/assets/js/select2.js') }}"></script>
     <!-- Bootstrap core JS-->
 
     <!-- Own JS-->

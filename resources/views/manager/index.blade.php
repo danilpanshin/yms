@@ -58,7 +58,7 @@
 @endsection
 
 @section('script')
-    <script src="{{ asset('/assets/js/select2.js') }}"></script>
+
     <script>
         $(document).ready(function() {
             $('#supplierSelect').select2({
